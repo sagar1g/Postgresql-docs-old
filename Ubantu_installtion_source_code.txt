@@ -1,0 +1,127 @@
+First we have to create directory.
+mkdir postgresql-15
+
+1.downlaod postgres file:- 
+
+wget https://ftp.postgresql.org/pub/source/v15.3/postgresql-15.3.tar.gz
+
+2.untar file
+
+tar -xzvf postgresql-15.3.tar.gz
+
+3.create postgres user:-
+
+sudo adduser postgres
+
+
+4. add readline & zlib & xml:- 
+
+sudo apt-get update
+apt-get install libreadline-dev -y
+apt install build-essential -y
+apt install zlib1g-dev -y
+sudo apt-get install libldap2-dev
+sudo apt-get install libxml2
+sudo apt autoremove
+sudo apt-get install libxml2
+apt-get install libxml2-dev -y
+sudo apt-get install libxslt-dev -y
+sudo apt-get install uuid-dev libossp-uuid-dev build-essential -y
+
+5.configure & make:-
+
+./configure  --prefix=/usr/local/pgsql-15.3  --with-ldap --with-libxml --with-libxslt --with-uuid=e2fs
+make && make install
+
+6. configure contrib package:- 
+
+make && make install
+
+
+7.create data_directory:- 
+
+makdir -p /application/postgresql-15/data----------------------------------------------------(data directory)
+
+chown -R postgres:postgres  /application
+chmod -R  750 /application/postgresql-15/data
+
+
+8.switch user:- 
+
+sudo su - postgres
+
+9.create database cluster:- 
+
+/usr/lib/pgsql-15.3/bin/initdb -D /application/postgresql-15/data
+
+10. start postgres service:- 
+
+/usr/local/pgsql/bin/pg_ctl -D /usr/local/pgsql/data  start -l log_file
+
+11.install postgresql-client:-
+
+apt -y  install postgresql-client-common
+apt -y install postgresql-client-14 
+ 
+12. if required create sockat file:- 
+
+cd /var/run/
+mkdir postgresql
+chown postgres:postgres  postgresql
+chmod -R 2775 postgresql 
+
+add parameter on postgres config file:- 
+
+vi postgresql.conf
+
+unix_socket_directories = '/var/run/postgresql'
+external_pid_file = '/var/run/postgresql/15-main.pid' 
+
+
+13.create bash profile(env):-
+ 
+vi .bash_profile ----------------------------------(postgres,root user)
+export PATH=/usr/lib/pgsql-15.3/bin:$PATH
+export PGDATA=/application/postgresql-15/data
+export PGPORT=5432
+export PGDATABASE=postgres
+export PGHOST=/run/postgresql
+
+source .bash_profile -----------------------------------(postgres,root user)
+
+14.create postgresql service file:- 
+
+vi /etc/systemd/system/postgresql-15.service
+
+[Unit]
+Description=PostgreSQL Database Server
+After=network.target
+
+[Service]
+Type=forking
+User=postgres
+ExecStart=/usr/lib/pgsql-15.3/bin/pg_ctl -D /data/postgresql-15/data start
+ExecStop=/usr/lib/pgsql-15.3/bin/pg_ctl -D /data/postgresql-15/data stop
+ExecReload=/usr/lib/pgsql-15.3/bin/pg_ctl -D /data/postgresql-15/data reload
+#PIDFile=/run/postgresql/15-main.pid
+TimeoutSec=-10
+
+[Install]
+WantedBy=multi-user.target
+
+
+systemctl daemon-reload
+systemctl enable postgresql.service
+systemctl start postgresql.service
+
+15. configure log parameter on postgersql configuration file:- 
+ 
+vi postgresql.conf:-
+ 
+log_directory- ‘/data/postgresql-15/data/log’ 
+logging_collector-on and open log_rotation_age=7d
+log_destination = 'stderr'
+log_rotation_size = 10MB 
+
+
+
