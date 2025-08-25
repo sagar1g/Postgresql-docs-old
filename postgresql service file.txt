@@ -1,0 +1,20 @@
+vi /etc/systemd/system/postgresql-14.11.service
+
+[Unit]
+Description=PostgreSQL Database Server
+After=network.target
+
+[Service]
+Type=forking
+User=postgres
+ExecStart=/usr/lib/postgresql14.11/bin/pg_ctl -D /var/lib/pgsql/data start
+ExecStop=/usr/lib/postgresql14.11/bin/pg_ctl -D /var/lib/pgsql/data stop
+ExecReload=/usr/lib/postgresql14.11/bin/pg_ctl -D /var/lib/pgsql/data reload
+#PIDFile=/run/postgresql/14-main.pid
+TimeoutSec=-10
+
+[Install]
+WantedBy=multi-user.target
+
+
+/usr/pgsql-14.11/bin/pg_ctl -D /var/lib/pgsql/14 start
