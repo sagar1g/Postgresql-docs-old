@@ -1,0 +1,25 @@
+overview of PostgreSQL architecture:
+
+1. Client: Applications or users connect to PostgreSQL using a client library or tool (e.g., psql, pgAdmin).
+
+2. Server: The PostgreSQL server accepts connections, processes queries, and manages data. It consists of:
+    - Postmaster: The main server process that coordinates activities.
+    - Backend: Separate processes that handle individual client connections (one per client).
+
+3. Database: A collection of schemas, tables, and data.
+    - Schemas: Logical groupings of tables and objects (like a namespace).
+    - Tables: Storage structures for data.
+    - Indexes: Data structures that improve query performance.
+
+4. Storage:
+    - Data Files: Store actual data (rows) in tables.
+    - WAL (Write-Ahead Logging) Files: Record changes (transactions) for data integrity and recovery.
+    - Configuration Files: Store server settings and parameters.
+
+5. Memory:
+    - Shared Buffer Cache: A memory area that stores frequently accessed data.
+    - WAL Buffer: A memory area that stores transaction log records.
+
+6. Processes:
+    - Background Worker: Performs tasks like vacuuming, statistics collection, and auto-vacuum.
+    - Lock Manager: Manages concurrency and locking for data access.
