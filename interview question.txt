@@ -1,0 +1,120 @@
+Q1.We need to perform vacuuming separately while my autovaccum paratmeter is activated.
+ans:-
+Performing vacuuming separately alongside autovacuum might be necessary for immediate space reclamation, 
+optimization of specific tables, or handling long-running transactions that autovacuum might not address effectively.
+
+
+=============================================================================================================================
+
+Q2. difference between autovacuum,vaccum and full vaccum analze
+ans:-
+Autovacuum:
+
+Automated Process: Autovacuum is an automated process in PostgreSQL that runs in the background to reclaim storage occupied by dead tuples and update statistics.
+
+Granular Control: It operates based on predefined thresholds and schedules, and it prioritizes tables that require vacuuming the most.
+
+Maintenance Daemon: Autovacuum is managed by a dedicated background process called the autovacuum daemon, which periodically checks for tables that need vacuuming or analyzing.
+Incremental Maintenance: Autovacuum performs incremental maintenance, meaning it targets only the necessary portions of a table to reclaim space and update statistics, which minimizes the impact on database performance.
+
+VACUUM:
+
+Manual Command: VACUUM is a manual command in PostgreSQL used to reclaim storage occupied by dead tuples and update statistics for a specific table or database.
+
+Table-Level Operation: When executed without additional options, VACUUM operates at the table level, meaning it only affects the specified table.
+
+Locking Behavior: VACUUM acquires exclusive locks on the tables it operates on, which can block concurrent operations until the vacuuming process completes.
+
+Regular Maintenance: It's typically used for regular maintenance tasks, especially when autovacuum is not sufficient or when immediate space reclamation is necessary.
+
+FULL VACUUM:
+
+Manual Command: FULL VACUUM is also a manual command in PostgreSQL used to reclaim storage occupied by dead tuples and update statistics for a specific table or database.
+
+Aggressive Operation: Unlike regular VACUUM, FULL VACUUM is more aggressive and thorough. It reclaims more space by rewriting the entire contents of the table, whereas regular VACUUM only marks dead tuples for reuse.
+
+Exclusive Locks: FULL VACUUM acquires exclusive locks on the tables it operates on, meaning it can block all other operations until the process completes.
+
+Resource-Intensive: Due to its aggressive nature, FULL VACUUM can be more resource-intensive and can potentially impact database performance more significantly compared to regular VACUUM.
+
+analyze:- 
+
+1.ANALYZE in PostgreSQL collects statistics about the contents of tables, helping the database understand 
+the data better and make smarter decisions when running queries.
+
+2.As data in tables changes, these statistics can become outdated. 
+The ANALYZE command is used to update these statistics.
+
+ANALYZE helps PostgreSQL understand the shape and size of your data, so it can run your queries faster.
+
+In summary, autovacuum is an automated background process that handles incremental maintenance, 
+VACUUM is a manual command used for regular maintenance tasks, 
+and FULL VACUUM is a more aggressive variant of VACUUM that rewrites the entire table contents. 
+Each serves a specific purpose in PostgreSQL maintenance and space reclamation strategies.
+
+
+===================================================================================================================
+
+Q3. what is diiference between rpm install and source code install in postgresql
+ans:-
+
+1. To answer your question, makefiles generally compile and install from source code, whereas rpm packages are precompiled binaries. 
+Make will not "solve" dependency problems for you, however it is possible that the source package includes some dependencies which a distribution package may not.
+
+2. RPMs are packages of binary files. When you install an RPM, the binary files are placed in the correct file locations. 
+Also, the RPM database remember that you installed it and it is possible to uninstall it.
+
+3. Source files are not binary files. They are really a bunch of code files that need to be compiled into binary files. When you get an archive of source files .tar.gz 
+they must be compiled into binaries and then manually copied into the correct place.
+
+
+RPM Install:
+
+Packaged Binaries: RPM install involves using the RPM package manager to install pre-packaged binaries of PostgreSQL.
+
+Dependency Resolution: RPM handles dependencies automatically, ensuring that all required libraries and components are installed along with PostgreSQL.
+
+System Integration: RPM packages are designed to integrate seamlessly with the operating system, and installation, upgrades, and removals are managed using the package manager.
+
+Ease of Maintenance: RPM installations are generally easier to maintain because the package manager tracks installed files and facilitates upgrades and removals.
+
+Source Code Install:
+
+Manual Compilation: Installing from source code requires manually downloading the PostgreSQL source code tarball from the official PostgreSQL website and compiling it on your system.
+
+Customization and Flexibility: Installing from source code gives you more flexibility to customize PostgreSQL's build options and settings to suit your specific needs.
+
+Latest Version: You have the ability to install the latest version of PostgreSQL available, which might not be available via RPM if the distribution repositories haven't been updated.
+
+Dependency Management: You'll need to manually install any dependencies required for compilation, which can be more complex compared to using RPM.
+
+In summary, RPM install provides a convenient way to install pre-packaged binaries of PostgreSQL with automatic dependency resolution 
+and system integration, while installing from source code offers greater flexibility 
+and control over the installation process, including the ability to install the latest version and customize build options. 
+The choice between the two methods depends on your specific requirements and preferences, as well as the conventions and policies of your organization or environment.
+
+============================================================================================================================
+
+4. what is lsn & explain:- 
+
+lsn number:- 1513/F7AC0000
+wal file:- 0000000100001513000000F7
+
+1513: This is like a chapter number in a book. It tells you which "chapter" (or WAL file segment) you are in. 
+In this case, it's the file named 0000000100001513000000F7.
+
+F7AC0000: This is like a specific page number inside that chapter. It points to a particular position (offset) in that WAL file. F7AC means we're at a specific point (or "page") within that file.
+
+So, together, 1513/F7AC0000 is telling you the exact position (WAL file + location) 
+where PostgreSQL is working or recovering from.
+
+
+lsn:-
+LSN (Log Sequence Number) is a marker that shows where a change was made in the database log. 
+It helps track changes and ensures everything stays in order.
+
+
+
+
+
+
