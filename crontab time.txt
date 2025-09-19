@@ -1,0 +1,19 @@
+1 6 * * * /usr/sbin/ntpdate -s dnscache5.netmagicians.com 2>&1
+*/2 * * * * /bin/sh /usr/local/sbin/system-mon.sh > /dev/null 2>&1
+#0 0 * * 0 /usr/bin/find /home/monitoring/system* -mtime +60 -type f -delete
+0 0 * * 0 /usr/bin/find /home/monitoring/ -type f -name 'system*' -mtime +60 -exec rm {} \;
+
+
+#########################################Postgres Scripts#######################
+
+
+*/10 * * * * /home/infra.mg/scripts/disk_space_alert.sh
+
+*/10 * * * * /home/infra.mg/scripts/port_status.sh
+
+*/10 * * * * /data/long_run/long_run.sh
+
+
+###############################################Max Connection####################################################
+
+#*/10 * * * *  /data/no_connection/max_connection.sh

@@ -1,0 +1,581 @@
+
+   1  vi /etc/ssh/sshd_config
+    2  systemctl restart sshd
+    3  ip a
+    4  vi /etc/resolv.conf
+    5  apt update
+    6  vi hardening.sh
+    7  chmod +x hardening.sh
+    8  ./hardening.sh
+    9  curl -so wazuh-agent-4.3.8.deb https://packages.wazuh.com/4.x/apt/pool/main/w/wazuh-agent/wazuh-agent_4.3.8-1_amd64.deb && sudo WAZUH_MANAGER='10.0.12.11' WAZUH_AGENT_GROUP='default' dpkg -i ./wazuh-agent-4.3.8.deb
+   10  sudo systemctl daemon-reload
+   11  sudo systemctl enable wazuh-agent
+   12  sudo systemctl start wazuh-agent
+   13  systemctl status wazuh-agent
+   14  apt install prometheus-node-exporter -y
+   15  passwd test
+   16  init 6
+   17  ip a
+   18  sudo passwd root
+   19  vi /etc/ssh/ssh_config
+   20  vi /etc/ssh/ssh_config.d/
+   21  q!
+   22  vi /etc/ssh/sshd_config
+   23  systemctl restart sshd
+   24  ping 10.0.15.1
+   25  ssh root@10.0.15.32
+   26  cd
+   27  lsblk
+   28  mkfs.ext4 /dev/vdb
+   29  blkid
+   30  vi /etc/fstab
+   31  mount /dev/vdb  /data
+   32  mkdir /data
+   33  mount /dev/vdb  /data
+   34  df -h
+   35  init 6
+   36  df -h
+   37  mount /dev/vdb /data/
+   38  df -h
+   39  cd /data
+   40  ls -altr
+   41  du -sh .
+   42  du -sh *
+   43  cd
+   44  lsblk
+   45  df -h
+   46  vi /etc/fstab
+   47  umount /data/
+   48  mount /dev/vdb /data/
+   49  df -h
+   50  exit
+   51  lsb_release -a
+   52  hostname
+   53  lscpu
+   54  free -h
+   55  df -h
+   56  ifconfig
+   57  apt install net-tools
+   58  ifconfig
+   59  ping www.google.com
+   60  psql --version
+   61  clear
+   62  history
+   63  clear
+   64  hostname -i
+   65  apt-get purge postgresql-contrib
+   66  apt autoremove postgresql-contrib
+   67  clear
+   68  cd /etc/
+   69  ls -ltrh
+   70  ls -ltrh | grep post
+   71  rm -rf postgresql
+   72  cd /var/lib/
+   73  ls -ltrh | grep postgres
+   74  rm postgresql
+   75  rm -rf  postgresql
+   76  clear
+   77  cd
+   78  apt install postgresql-15
+   79  clear
+   80  psql --version
+   81  clear
+   82  hostname -i
+   83  history
+   84  apt autoremove postgresql-contrib
+   85  apt autoremove postgresql
+   86  psql --version
+   87  cd /etc/
+   88  ls -ltrh| grep post
+   89  systemctl status postgresql
+   90  clear
+   91  sudo -i -u postgres
+   92  cd
+   93  apt autoremove postgresql-15
+   94  apt autoremove postgresql-client-15
+   95  apt autoremove po
+   96  cd /etc
+   97  ls -ltrh | grep post
+   98  rm -rf postgresql postgresql-common/
+   99  ls -ltr | grep post
+  100  cd /var/lib
+  101  ls
+  102  ls -ltrh | grep post
+  103  rm -rf postgresql
+  104  ls
+  105  clear
+  106  apt search postgresql-15
+  107  psql
+  108  clear
+  109  apt install postgresql-15
+  110  cd
+  111  sudo -u postgres psql
+  112  systemctl status postgresql
+  113  psql --version
+  114  sudo -i -u postgres
+  115  ps -ef | grep postgres
+  116  ps -ef | grep post
+  117  psql
+  118  cd /var/lib/postgresql/
+  119  ls
+  120  cd ..
+  121  l
+  122  apt search postgresql-15
+  123  apt install postgresql-15
+  124  systemctl restart postgresql
+  125  systemctl status postgresql
+  126  cd /var/lib/postgresql/
+  127  ls
+  128  exit
+  129  clear
+  130  apt autoremove postgresql-* -y
+  131  exit
+  132  history
+  133  exit
+  134  reboot
+  135  clear
+  136  top
+  137  sudo ufw allow 5432/tcp
+  138  sudo ufw allow 6432/tcp
+  139  sudo ufw allow 8008/tcp
+  140  sudo ufw allow 2379/tcp
+  141  sudo ufw allow 2380/tcp
+  142  sudo ufw allow http
+  143  sudo ufw allow 5000/tcp
+  144  sudo ufw allow 5001/tcp
+  145  sudo ufw allow 7000/tcp
+  146  sudo ufw allow from 224.0.0.18 comment "keepalived"
+  147  sudo ufw allow to 224.0.0.18 comment "keepalived"
+  148  sudo ufw reload
+  149  top
+  150  sudo apt -y install wget ca-certificates
+  151  sudo wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+  152  sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ $(lsb_release -cs)-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
+  153  sudo apt update
+  154  sudo apt -y install postgresql-15
+  155  sudo systemctl stop postgresql
+  156  sudo systemctl disable postgresql
+  157  sudo ln -s /usr/lib/postgresql/15/bin/* /usr/sbin/
+  158  sudo su postgres
+  159  clear
+  160  top
+  161  sudo apt -y install etcd
+  162  sudo systemctl stop etcd
+  163  sudo systemctl disable etcd
+  164  sudo rm -rf /var/lib/etcd/default
+  165  sudo mv /etc/default/etcd /etc/default/etcd-orig
+  166  sudo nano /etc/default/etcd   -----------------------------------------   vi  /etc/default/etcd
+  167  cd ~
+  168  nano .profile  ----------------------------------------------   vi .profile
+  169  top
+  170  nano /etc/hosts
+  171  sudo systemctl start etcd
+  172  systemctl enable etcd
+  173  systemctl status  etcd
+  174  systemctl status etcd.service
+  175  journalctl -xeu etcd.service
+  176  reboot
+  177  clear
+  178  top
+  179  vi /etc/hosts
+  180  clear
+  181  vi .profle
+  182  ls -lart
+  183  vi .profle
+  184  vi .profile
+  185  ip a
+  186  telnet 10.10.66.69 2380
+  187  apt update
+  188  apt install telnet
+  189  telnet 10.10.66.69 2380-
+  190  telnet 10.10.66.69 2380
+  191  top
+  192  systemctl start etcd
+  193  systemctl status etcd
+  194  top
+  195  sudo apt -y install python3 python3-pip python3-dev libpq-dev
+  196  udo pip3 install launchpadlib --upgrade setuptools psycopg2
+  197  sudo pip3 install launchpadlib --upgrade setuptools psycopg2
+  198  sudo apt -y install python3-etcd patroni
+  199  sudo systemctl stop patroni
+  200  sudo systemctl disable patroni
+  201  sudo nano /etc/patroni/config.yml
+  202  top
+  203  ls -l /etc/patroni/config.yml
+  204  sudo chmod 644 /etc/patroni/config.yml
+  205  systemctl start patroni
+  206  systemctl status patroni
+  207  top
+  208  sudo apt -y install pgbouncer
+  209  sudo systemctl stop pgbouncer
+  210  sudo systemctl disable pgbouncer
+  211  top
+  212  sudo nano /etc/pgbouncer/userlist.txt ------------------------------------------------  vi 
+  213  sudo cp -p /etc/pgbouncer/pgbouncer.ini /etc/pgbouncer/pgbouncer.ini.orig
+  214  sudo nano /etc/pgbouncer/pgbouncer.ini
+  215  sudo systemctl start pgbouncer
+  216  sudo systemctl status pgbouncer
+  217  top
+  218  sudo systemctl status pgbouncer
+  219  top
+  220  sudo apt -y install haproxy
+  221  sudo systemctl stop haproxy
+  222  sudo systemctl disable haproxy
+  223  top
+  224  sudo mv /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.orig
+  225  sudo nano /etc/haproxy/haproxy.cfg
+  226  top
+  227  sudo apt -y install keepalived
+  228  sudo systemctl stop keepalived
+  229  sudo systemctl disable keepalived
+  230  sudo nano /etc/sysctl.conf
+  231  sudo sysctl --system
+  232  sudo sysctl -p
+  233  sudo nano /etc/keepalived/keepalived.conf
+  234  top
+  235  sudo systemctl start haproxy
+  236  sudo systemctl status haproxy
+  237  sudo su - postgres
+  238  clear
+  239  sudo nano /etc/haproxy/haproxy.cfg
+  240  top
+  241  ifconfig 10.10.66.36
+  242  top
+  243  ip a 10.10.66.36
+  244  clear
+  245  sudo nano /etc/keepalived/keepalived.conf
+  246  top
+  247  sudo systemctl start haproxy
+  248  sudo systemctl status haproxy
+  249  ls -ld /var/lib/postgresql
+  250  cd  /var/lib/postgresql
+  251  cd /var/lib/postgresql
+  252  sudo mkdir -p /var/lib/postgresql
+  253  sudo chown -R postgres:postgres /var/lib/postgresql
+  254  sudo chmod 700 /var/lib/postgresql
+  255  sudo systemctl start haproxy
+  256  sudo systemctl status haproxy
+  257  sudo systemctl status patroni
+  258  top
+  259  sudo systemctl start haproxy
+  260  sudo systemctl status haproxy
+  261  top
+  262  sudo systemctl start keepalived
+  263  sudo systemctl status keepalived
+  264  sudo nano /etc/host
+  265  sudo ufw allow http
+  266  sudo ufw allow from 224.0.0.18 comment "keepalived"
+  267  sudo ufw allow to 224.0.0.18 comment "keepalived"
+  268  sudo ufw reload
+  269  sudo nano /etc/default/etcd
+  270  cd ~
+  271  nano .profile
+  272  sudo systemctl start etcd
+  273  sudo systemctl status etcd
+  274  etcdctl endpoint status --write-out=table --endpoints=$ENDPOINTS
+  275  sudo nano /etc/patroni/config.yml
+  276  sudo systemctl start patroni
+  277  sudo systemctl status patroni
+  278  sudo nano /etc/pgbouncer/userlist.txt
+  279  sudo nano /etc/pgbouncer/pgbouncer.ini
+  280  sudo systemctl start pgbouncer
+  281  sudo nano /etc/haproxy/haproxy.cfg
+  282  sudo nano /etc/sysctl.conf
+  283  sudo sysctl --system
+  284  sudo sysctl -p
+  285  sudo nano /etc/keepalived/keepalived.conf
+  286  sudo systemctl start haproxy
+  287  sudo systemctl status haproxy
+  288  exit
+  289  clear
+  290  systemctl status etcd
+  291  clear
+  292  top
+  293  sudo systemctl start patroni
+  294  sudo systemctl status patroni
+  295  sudo systemctl start haproxy
+  296  sudo systemctl status haproxy
+  297  top
+  298  sudo systemctl start etcd
+  299  sudo systemctl status etcd
+  300  sudo systemctl start pgbouncer
+  301  sudo systemctl status haproxy
+  302  sudo systemctl start patroni
+  303  sudo systemctl status patroni
+  304  sudo systemctl start pgbouncer
+  305  sudo systemctl start haproxy
+  306  sudo systemctl status haproxy
+  307  exit
+  308  sudo systemctl status haproxy
+  309  sudo systemctl status patroni
+  310  ps -ef|grep postgres
+  311  su - postgres
+  312  ss -tunp | grep 4071
+  313  ss -tunp | grep 4072
+  314  top
+  315  sudo nano /etc/haproxy/haproxy.cfg
+  316  top
+  317  sudo systemctl start patroni
+  318  sudo systemctl status patroni
+  319  top
+  320  sudo systemctl start keepalived
+  321  sudo systemctl status keepalived
+  322  sudo systemctl status patroni
+  323  top
+  324  exit
+  325  hostnamectl
+  326  su - postgres
+  327  df -h
+  328  /data
+  329  cd /data
+  330  ls -lrt
+  331  pwd
+  332  ls -lrt /..
+  333  su - postgres
+  334  sudo systemctl status patroni
+  335  systemctl stop patroni
+  336  systemctl start patroni
+  337  df -h
+  338  ps -ef|grep postgres
+  339  cat /var/lib/postgresql/15/main/postgresql.conf
+  340  nano /var/lib/postgresql/15/main/postgresql.conf
+  341  systemctl restart postgresql
+  342  systemctl status postgresql
+  343  top
+  344  sudo systemctl start etcd
+  345  sudo systemctl status etcd
+  346  sudo systemctl start patroni
+  347  sudo systemctl status patroni
+  348  sudo systemctl start pgbouncer
+  349  sudo systemctl start keepalived
+  350  sudo systemctl status keepalived
+  351  sudo systemctl status pgbouncer
+  352  top
+  353  sudo systemctl status patroni
+  354  clear
+  355  sudo systemctl status patroni
+  356  patronictl -c /etc/patroni/config.yml list
+  357  exit
+  358  cat /var/lib/postgresql/15/main/postgresql.conf
+  359  ps -ef|grep patroni
+  360  cat /etc/patroni/config.yml
+  361  ps -ef|grep patroni
+  362  sudo patronictl -c /etc/patroni/config.yml list
+  363  cat /etc/patroni/config.yml
+  364  /etc/patroni/config.yml                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          
+  365  ps -ef|grep postgres
+  366  sudo nano /etc/patroni/config.yml
+  367  sudo nano /var/lib/postgresql/15/main/postgresql.conf
+  368  sudo nano /etc/patroni/config.yml
+  369  systemctl restart postgresql
+  370  systemctl status postgresql
+  371  sudo systemctl start etcd
+  372  sudo systemctl status etcd
+  373  sudo systemctl start patroni
+  374  sudo systemctl status patroni
+  375  sudo nano /var/lib/postgresql/15/main/postgresql.conf
+  376  sudo nano /etc/patroni/config.yml
+  377  top
+  378  exit
+  379  nano /etc/pgbouncer/pgbouncer.ini
+  380  sudo ufw allow 4702
+  381  systemctl restart postgresql
+  382  systemctl status postgresql
+  383  systemctl start etcd
+  384  systemctl status etcd
+  385  systemctl start patroni
+  386  systemctl status patroni
+  387  sudo systemctl start pgbouncer
+  388  sudo systemctl status pgbouncer
+  389  sudo systemctl start keepalived
+  390  sudo systemctl status keepalived
+  391  nano /etc/pgbouncer/pgbouncer.ini
+  392  systemctl status patroni
+  393  top
+  394  nano /etc/pgbouncer/pgbouncer.ini
+  395  top
+  396  ss -a | grep 4702
+  397  sudo nano /var/lib/postgresql/15/main/postgresql.conf
+  398  sudo nano /etc/patroni/config.yml
+  399  systemctl restart postgresql
+  400  systemctl status postgresql
+  401  sudo systemctl restart pgbouncer
+  402  sudo systemctl status pgbouncer
+  403  systemctl restart etcd
+  404  systemctl status etcd
+  405  systemctl restart patroni
+  406  systemctl status patroni
+  407  ss -a | grep 4702
+  408  top
+  409  ss -a | grep 4702
+  410  sudo su - postgres
+  411  exit
+  412  systemctl restart postgresql
+  413  systemctl status postgresql
+  414  sudo su - postgres
+  415  sudo nano /var/lib/postgresql/15/main/postgresql.conf
+  416  sudo nano /etc/patroni/config.yml
+  417  nano /etc/pgbouncer/pgbouncer.ini
+  418  sudo systemctl restart pgbouncer
+  419  systemctl restart etcd
+  420  systemctl restart patroni
+  421  sudo systemctl restart keepalived
+  422  systemctl status patroni
+  423  sudo su - postgres
+  424  reboot
+  425  ps -ef|grep postgres
+  426  ps -ef|grep patroni
+  427  systemctl status patroni
+  428  systemctl restart patroni
+  429  systemctl status patroni
+  430  ps -ef|grep postgres
+  431  patronictl -c /etc/patroni/config.yml list
+  432  cat /etc/patroni/config.yml
+  433  ps -ef|grep postgres
+  434  patronictl -c /etc/patroni/config.yml list
+  435  exit
+  436  sudo patronictl -c /etc/patroni/config.yml list
+  437  systemctl stop patroni
+  438  sudo patronictl -c /etc/patroni/config.yml list
+  439  systemctl start patroni
+  440  sudo patronictl -c /etc/patroni/config.yml list
+  441  exit
+  442  systemctl status patroni
+  443  systemctl status postgresql
+  444  systemctl restart postgresql
+  445  systemctl status postgresql
+  446  systemctl status patroni
+  447  exit
+  448  sudo patronictl -c /etc/patroni/config.yml list
+  449  systemctl stop patroni
+  450  exit
+  451  sudo patronictl -c /etc/patroni/config.yml list
+  452  df -h
+  453  cat /etc/patroni/config.yml
+  454  cd /var/lib/postgresql/15/main
+  455  ls -lrt
+  456  cd pg_wal
+  457  ls -lrt
+  458  cd /var/lib/postgresql/15/main
+  459  cd pg_wal/
+  460  ls -lrt
+  461  sudo patronictl -c /etc/patroni/config.yml list
+  462  ssh 000000150000000000000006 test@patroni1:/data
+  463  scp 000000150000000000000006 test@10.10.66.42:/data
+  464  scp 000000150000000000000006 test@patroni1:/data/
+  465  scp 000000150000000000000006 test@patroni1:/data
+  466  scp 000000150000000000000006 test@patroni1:/data/test
+  467  scp 000000170000000000000006 test@patroni1:/data/test
+  468  scp 000000160000000000000006 test@patroni1:/data/test
+  469  ls -lrt
+  470  scp 000000180000000000000006 test@patroni1:/data/test
+  471  scp 000000190000000000000006 test@patroni1:/data/test
+  472  scp 0000001A0000000000000006 test@patroni1:/data/test
+  473  scp 0000001B0000000000000006 test@patroni1:/data/test
+  474  scp 0000001C0000000000000006 test@patroni1:/data/test
+  475  scp 0000001D0000000000000006 test@patroni1:/data/test
+  476  scp 0000001E0000000000000006 test@patroni1:/data/test
+  477  scp 0000001F0000000000000006 test@patroni1:/data/test
+  478  scp 000000200000000000000006 test@patroni1:/data/test
+  479  scp 000000210000000000000006 test@patroni1:/data/test
+  480  cd
+  481  systemctl start patroni
+  482  sudo patronictl -c /etc/patroni/config.yml list
+  483  systemctl stop patroni
+  484  sudo patronictl -c /etc/patroni/config.yml list
+  485  systemctl start patroni
+  486  sudo patronictl -c /etc/patroni/config.yml list
+  487  vi /var/log/syslog
+  488  sudo patronictl -c /etc/patroni/config.yml list
+  489  ps -ef|grep postgres
+  490  etcdctl memeber list
+  491  etcdctl member list
+  492  sudo patronictl -c /etc/patroni/config.yml list
+  493  etcdctl member list
+  494  ps -ef|grep ha
+  495  ps -ef|grep proxy
+  496  ps -ef|grep prox
+  497  ps -ef|grep HA
+  498  su - postgres
+  499  nslookup 10.10.66.100
+  500  cd /var/log
+  501  ls -lrt
+  502  vi syslog
+  503  df -h
+  504  systemctl status patroni
+  505  systemctl status postgresql
+  506  sudo nano /var/lib/postgresql/15/main/postgresql.conf
+  507  exit
+  508  telnet ip r
+  509  ip r
+  510  telnet 10.10.66.42 22
+  511  telnet 10.10.66.42 80
+  512  cd /var/lib/postgresql/15/main
+  513  ls - lrt
+  514  ls -lrt
+  515  systemctl restart patroni
+  516  ls -lrt
+  517  ps -ef| grep postgres
+  518  cd /var/lib/postgresql/15/main/pg_log
+  519  ls -lrt
+  520  vi postgresql-2024-03-28_Thu_16.log
+  521  ls -lrt
+  522  cd ..
+  523  ls -lrt
+  524  cd pg_log
+  525  ls -lrt
+  526  vi postgresql-2024-03-28_Thu_17.log
+  527  cat /etc/fstab
+  528  df -h
+  529  su - postgres
+  530  history
+  531  su - postgres
+  532  free -h
+  533  top -c
+  534  ps -ef|grep postgres
+  535  su - postgres
+  536  history
+  537  sudo patronictl -c /etc/patroni/config.yml list
+  538  systemctl status patroni.service
+  539  systemctl status postgresql.service
+  540  systemctl status postgresql@-15.service
+  541  systemctl status patroni.service
+  542  systemctl stop  patroni.service
+  543  systemctl start   patroni.service
+  544  systemctl status patroni.service
+  545  sudo patronictl -c /etc/patroni/config.yml list
+  546  su - postgres
+  547
+  548  sudo patronictl -c /etc/patroni/config.yml list
+  549  cd /var/lib/postgresql/15/main/
+  550  ll
+  551  sudo patronictl -c /etc/patroni/config.yml list
+  552  ll
+  553  less postgresql.auto.conf
+  554  sudo patronictl -c /etc/patroni/config.yml list
+  555  ll
+  556  vi postgresql.auto.conf
+  557  sudo patronictl -c /etc/patroni/config.yml list
+  558  ps -ef|grep postgres
+  559  su -  postgres
+  560  systemctl status patroni.service
+  561  systemctl stop  patroni.service
+  562  systemctl start   patroni.service
+  563  systemctl status patroni.service
+  564  su - postgres
+  565  ll
+  566  systemctl stop patroni.service
+  567  systemctl status etcd.service
+  568  systemctl stop  etcd.service
+  569  systemctl status etcd2.service
+  570  systemctl start  etcd.service
+  571  systemctl start  patroni.service
+  572  systemctl stop patroni.service
+  573  systemctl start  patroni.service
+  574  systemctl stop patroni.service
+  575  vi /etc/patroni/config.yml
+  576  systemctl stop   patroni.service
+  577  systemctl start    patroni.service
+  578  patronictl -c /etc/patroni/config.yml  list
+  579  su - postgres
+  580  history

@@ -1,0 +1,185 @@
+postgres@patroni2:~$ patronictl -c /etc/patroni/config.yml list
+
+
+etcdctl --endpoints=http://10.10.66.69:2379 member remove 2f5b3436ccc3b160
+
+
+51de8120567c835d, started, nbhesdbn2drvm2, http://10.31.208.8:2380, http://10.31.208.8:2379
+5554f6bf725575a0, started, nbhesdbn1drvm1, http://10.31.208.9:2380, http://10.31.208.9:2379
+ef253cbd24b78ac4, started, nbhesdbn3drvm3, http://10.31.208.7:2380, http://10.31.208.7:2379
+
+
+etcdctl member remove <memberId>
+etcdctl member add <name> --peer-urls=https://x.x.x.x:2380
+
+
+etcdctl --endpoints=http://10.10.66.69:2379  member list
+
+
+
+2f5b3436ccc3b160, started, patroni1, http://10.10.66.42:2380, http://10.10.66.42:2379
+
+
+
+etcdctl --endpoints=http://10.10.66.42:2379,http://10.10.66.69:2379,http://10.10.66.132:2379  endpoint health
+
+export ETCDCTL_API=3
+
+etcdctl --endpoints=http://10.10.66.69:2379,http://10.10.66.132:2379 endpoint status
+
+
+etcdctl --endpoints=http://10.10.66.69:2379,http://10.10.66.132:2379 cluster-health
+
+
+wget https://github.com/etcd-io/etcd/releases/download/v3.5.4/etcd-v3.5.4-linux-amd64.tar.gz
+tar xvf etcd-v3.5.4-linux-amd64.tar.gz
+sudo cp etcd-v3.5.4-linux-amd64/etcdctl /usr/local/bin/
+
+
+
+Check and Synchronize Clocks:
+
+Ensure that the system clocks on all etcd nodes are synchronized using ntpd or chrony.
+
+For example, using chrony:
+
+bash
+Copy code
+sudo apt-get install chrony -y
+sudo systemctl start chrony
+sudo systemctl enable chrony
+chronyc sources
+
+
+Error:-
+
+root@aemlhesdbn1dcvm1:~# etcdctl --endpoints=http://10.11.3.21:2379,http://10.11.3.22:2379  endpoint status
+No help topic for 'endpoint'
+root@aemlhesdbn1dcvm1:~# export ETCDCTL_API=3
+
+ans:-
+
+export ETCDCTL_API=3
+
+export ETCDCTL_API=2
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+To see in table wise content:- 
+
+etcdctl --endpoints=http://10.10.66.42:2379,http://10.10.66.69:2379,http://10.10.66.132:2379,http://10.31.208.9:2379,http://10.31.208.8:2379,http://10.31.208.7:2379 endpoint  --write-out=table status
+
+
+=http://10.127.113.159:7000
+
+unix_socket_directories 
+
+
+ping <etcd-peer-ip>
+traceroute <etcd-peer-ip>
+
+
+etcdctl --endpoints=http://10.10.66.42:2379 get /config/global/config
+
+
+
+
+
+etcdctl --endpoints=http://10.10.35.21:2379,http://10.10.35.22:2379,http://10.10.35.23:2379 cluster-health
+
+
+etcdctl --endpoints=http://192.168.29.160:2379,http://192.168.29.57:2379,http://192.168.29.124:2379,http://192.168.29.24:2379 member list
+
+etcdctl --endpoints=http://10.10.66.69:2379,http://10.10.66.132:2379 cluster-health
+
+
+etcdctl --endpoints=http://10.10.229.21:2379,http://10.10.229.22:2379,http://10.10.229.23:2379 endpoint health
+
++=====================================================================================================================================================
+
+curl --noproxy 10.10.229.21 http://10.10.229.21:2379/v2/keys
+
+
+
+========================================================================================================================================
+
+error:- 
+
+etcd.service: Main process exited, code=exited, status=2/INVALIDARGUMENT
+
+etcd panic on member rejoin after reset — tocommit(...) is out of range
+
+sol:- 
+
+1. From a healthy cluster node
+
+Run:
+
+ETCDCTL_API=3 etcdctl --endpoints=http://<healthy-node>:2379 member list
+
+
+✅ If you see your failed member still listed → you must remove it:
+
+ETCDCTL_API=3 etcdctl --endpoints=http://<healthy-node>:2379 member remove <member-ID>
+
+2. Add the member back
+
+From the same healthy node:
+
+ETCDCTL_API=3 etcdctl --endpoints=http://<healthy-node>:2379 member add DB-Witness --peer-urls=http://10.14.80.10:2380
+
+
+👉 This will output something like:
+
+ETCD_NAME="DB-Witness"
+ETCD_INITIAL_CLUSTER="etcd-1=http://10.14.80.11:2380,etcd-2=http://10.14.80.12:2380,DB-Witness=http://10.14.80.10:2380"
+ETCD_INITIAL_CLUSTER_STATE="existing"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster-1"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.14.80.10:2380"
+
+
+⚠️ Copy these values exactly — they are generated specifically for your cluster.
+
+3. On the DB-Witness node
+
+Stop etcd:
+
+systemctl stop etcd
+
+
+Clear old data:
+
+rm -rf /var/lib/etcd/*
+
+
+Update /etc/default/etcd or /etc/etcd/etcd.conf.yml with the values from step 2.
+
+Make sure:
+
+ETCD_NAME="DB-Witness"
+ETCD_INITIAL_CLUSTER_STATE="existing"
+ETCD_LISTEN_PEER_URLS="http://10.14.80.10:2380"
+ETCD_LISTEN_CLIENT_URLS="http://10.14.80.10:2379,http://127.0.0.1:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.14.80.10:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://10.14.80.10:2379"
+
+4. Restart
+systemctl daemon-reload
+systemctl start etcd
+systemctl status etcd -l
+
+5. Verify
+
+On any healthy node:
+
+ETCDCTL_API=3 etcdctl --endpoints=http://10.14.80.11:2379 member list
+
+
+You should now see DB-Witness active with started.
+
+✅ This is the only safe fix for tocommit(...) is out of range when rejoining a reset member.
+If you skip member add and just try to restart, etcd will always panic.
+
+
+=============================================================================================================================================================================
+

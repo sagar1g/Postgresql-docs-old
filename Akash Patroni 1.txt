@@ -1,0 +1,688 @@
+---------------------------------postgresql installation------------------------------------------------------------------------------------------
+
+First we have to create directory.
+
+mkdir postgresql-15
+
+1.wget https://ftp.postgresql.org/pub/source/v17.2/postgresql-17.2.tar.gz
+
+2.tar -xzvf postgresql-15.6.tar.gz
+
+3.cd postgresql-15.6
+
+sudo adduser postgres
+
+
+4. add readline
+
+sudo apt-get update
+
+--------------------ICU-----------------
+
+apt install libicu-dev -y
+
+sudo apt-get install libreadline-dev -y
+
+-----------------------------install c complier--------------------------------------------------
+
+sudo apt install build-essential -y
+
+--------------------------------zlib install ---------------------------------------------------------------
+
+sudo apt install zlib1g-dev -y
+
+-------------------------------- libxml2-----------------------------------
+
+sudo apt-get install libxml2
+
+----------------------------------------------xml
+apt-get install libreadline-dev -y
+apt-get install build-essential -y
+apt-get install zlib1g-dev -y
+apt-get install libldap2-dev -y
+apt-get install libxml2 -y
+apt-get install libxslt-dev -y
+apt install libssl-dev -y
+apt-get install uuid-dev libossp-uuid-dev build-essential -y
+ apt-get install libicu-dev -y                  ---------icu 
+
+============================================================= 
+apt install bison
+apt install flex 
+
+
+
+---------------------------------------------------------------------------------------------------------------------------------------
+
+yum install readline-devel  ------------------------------ centos ------------------------------------------------------------
+
+sudo apt-get install libreadline8
+
+
+5 sudo mkdir -p /usr/lib/pgsql-15.6------------------------------------------(bin directory)
+
+6 sudo chown postgres:postgres /usr/lib/pgsql-15.6
+
+7  ./configure  --prefix=/usr/lib/pgsql-16.6
+
+================================================================
+for ssl:- 
+
+./configure --prefix=/usr/lib/pgsql-16.6 --with-ldap --with-libxml --with-libxslt --with-openssl --with-uuid=e2fs --with icu
+
+without openssl :- 
+
+
+./configure --prefix=/usr/lib/pgsql-15.6.0 --with-ldap --with-libxml --with-libxslt --with-uuid=e2fs
+
+
+for uuid:- 
+
+./configure --prefix=/usr/lib/pgsql-15.6  --with-uuid=e2fs
+
+
+
+--------------------------------------------------------------------------------------------------------------
+make clean
+
+./configure --prefix=/usr/lib/pgsql-15.6.0 --with-openssl --with-ldap --with-libxml --with-libxslt --with-openssl --with-uuid=e2fs 
+
+sudo apt-get install -y libssl-dev
+ 
+------------------------------------------------------------------------------------------------------------------------
+ 
+8  make
+
+9 make install
+
+-----------------------------------------------------------------------------------------------------------------------
+
+10
+sudo useradd -m -s /bin/bash -g postgres postgres
+
+adduser postgres
+
+password:-postgres
+
+
+11 data_directory:- 
+
+mkdir -p /data/patroni----------------------------------------------------(data directory)
+
+chown -R postgres:postgres  /data
+chmod -R  750 /data/patroni
+
+
+12.sudo su - postgres
+
+13./usr/lib/pgsql-15.6/bin/initdb -D /data/patroni
+
+apt install postgresql-client-14
+
+14./usr/lib/pgsql-15.6.0/bin/pg_ctl -D /data/patroni start -l log_file
+
+15. postgresql-client:-
+
+i)apt update
+ii)echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" | sudo tee /etc/apt/sources.list.d/pgdg.list
+iii)apt -y  install postgresql-client-common
+1v) apt -y install postgresql-client-14
+ 
+ 
+16. Create sockat file:- 
+
+i)cd /var/run/
+ii)mkdir postgresql
+iii)chown postgres:postgres  postgresql
+iv)chmod -R 2775 postgresql 
+
+
+
+15. vi .bash_profile ----------------------------------(postgres,root user)
+export PATH=/usr/lib/pgsql-16.8/bin:$PATH
+export PGDATA=/data/pgdata
+export PGPORT=5432
+export PGDATABASE=postgres
+export PGHOST=/tmp
+
+/mnt/data/postgres/bin
+
+/mnt/data/postgres/data
+
+16.source .bash_profile -----------------------------------(postgres,root user)
+
+17.vi /etc/systemd/system/postgresql-16.service
+
+[Unit]
+Description=PostgreSQL Database Server
+After=network.target
+
+[Service]
+Type=forking
+User=postgres
+ExecStart=/usr/lib/pgsql-16.8/bin/pg_ctl -D /data/pgdata start
+ExecStop=/usr/lib/pgsql-16.8/bin/pg_ctl -D /data/pgdata stop
+ExecReload=/usr/lib/pgsql-16.8/bin/pg_ctl -D /data/pgdata reload
+
+TimeoutSec=-10
+
+[Install]
+WantedBy=multi-user.target
+
+
+[Unit]
+Description=PostgreSQL Database Server
+After=network.target
+
+[Service]
+Type=forking
+User=postgres
+ExecStart=/usr/lib/pgsql-15.6/bin/pg_ctl -D /data/postgresql-15/data start
+ExecStop=/usr/lib/pgsql-15.6/bin/pg_ctl -D /data/postgresql-15/data stop
+ExecReload=/usr/lib/pgsql-15.6/bin/pg_ctl -D /data/postgresql-15/data reload
+#PIDFile=/run/postgresql/15-main.pid
+TimeoutSec=300s
+
+[Install]
+WantedBy=multi-user.target
+
+
+(OR)
+
+ vi /etc/systemd/system/postgresql-14.service
+
+[Unit]
+Description=PostgreSQL Database Server
+After=network.target
+
+[Service]
+Type=forking
+User=postgres
+Group=postgres
+ExecStart=/usr/lib/postgresql/14/bin/pg_ctl start -D /pg_data/db/postgresql/14/main  -o "-c config_file=/etc/postgresql/14/main/postgresql.conf"
+ExecStop=/usr/lib/postgresql/14/bin/pg_ctl stop -D /pg_data/db/postgresql/14/main
+ExecReload=/usr/lib/postgresql/14/bin/pg_ctl reload -D /pg_data/db/postgresql/14/main
+TimeoutSec=0
+PIDFile=/pg_data/db/postgresql/14/main/postmaster.pid
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+18.systemctl daemon-reload
+
+19.systemctl enable postgresql.service
+
+20.systemctl start postgresql.service
+
+21 postgresql.conf:-
+
+log:- 
+1)log_directory- ‘/data/postgresql-15/data/log’ 
+2) logging_collector-on and open log_rotation_age=7d
+3)log_destination = 'stderr'
+4)log_rotation_size = 10MB 
+
+unix:- 
+1)unix_socket_directories = '/var/run/postgresql'
+2)external_pid_file = '/var/run/postgresql/15-main.pid'  
+
+*******************************************************************************************************************************************
+*******************************************************************************************************************************************
+-----------------------etcd----------------------------------------------------
+
+vi /etc/hosts                                                                      192.168.122.50 pgsql-vip
+
+10.10.3.122 CDBTESTDCSERVER1 
+10.10.3.135 CDBTESTDCSERVER2 
+10.10.3.140 CDBTESTDCSERVER3
+
+10.10.3.123  CDBTESTDRSERVER1
+10.10.3.131  CDBTESTDRSERVER2
+10.10.3.121  CDBTESTDRSERVER3
+
+
+sudo apt -y install etcd
+sudo systemctl stop etcd
+sudo rm -rf /var/lib/etcd/default
+sudo mv /etc/default/etcd /etc/default/etcd-orig
+cd ~
+vi /etc/hosts
+sudo systemctl start etcd
+systemctl enable etcd
+systemctl status  etcd
+systemctl status etcd.service
+
+vi  /etc/default/etcd
+
+ETCD_NAME=CDBTESTDRSERVER3
+ETCD_DATA_DIR="/var/lib/etcd/CDBTESTDRSERVER3"
+ETCD_LISTEN_PEER_URLS="http://10.10.3.121:2380"
+ETCD_LISTEN_CLIENT_URLS="http://10.10.3.121:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://10.10.3.121:2380"
+ETCD_INITIAL_CLUSTER="CDBTESTDRSERVER1=http://10.10.3.123:2380,CDBTESTDRSERVER2=http://10.10.3.131:2380,CDBTESTDRSERVER3=http://10.10.3.121:2380"
+ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_ADVERTISE_CLIENT_URLS="http://10.10.3.121:2379"
+ETCD_ENABLE_V2="true"
+
+
+#vi .profile
+
+
+export PGDATA="/data/postgresql-15/data"
+export ETCDCTL_API="3"
+export PATRONI_ETCD_URL="http://127.0.0.1:2379"
+export PATRONI_SCOPE="pg_cluster"
+vzhesdbn1dcvm1=10.10.131.6
+vzhesdbn1dcvm1=10.10.131.101
+vzhesdbn1dcvm1=10.10.131.103
+#ENDPOINTS=$10.10.66.42:2379,$10.10.66.69:2379,$10.10.66.132:2379
+ENDPOINTS=$vzhesdbn1dcvm1:2379,$vzhesdbn2dcvm2:2379,$vzhesdbn3dcvm3:2379
+
+
+ETCD_NAME=dr2
+ETCD_DATA_DIR="/var/lib/etcd/dr2"
+ETCD_LISTEN_PEER_URLS="http://192.168.29.57:2380"
+ETCD_LISTEN_CLIENT_URLS="http://192.168.29.57:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.29.57:2380"
+ETCD_INITIAL_CLUSTER="dc-1=http://192.168.29.24:2380,dc2=http://192.168.29.124:2380,dr=http://192.168.29.160:2380,dr1-virtual-machine=http://192.168.29.57:2380"
+ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_ADVERTISE_CLIENT_URLS="http://192.168.29.57:2379"
+ETCD_ENABLE_V2="true"
+
+
+
+name: dr_etcd_node
+data-dir: /var/lib/etcd
+listen-client-urls: http://0.0.0.0:2379
+advertise-client-urls: http://dr_server_ip:2379
+listen-peer-urls: http://0.0.0.0:2380
+initial-advertise-peer-urls: http://dr_server_ip:2380
+initial-cluster: etcd1=http://primary1_ip:2380,etcd2=http://primary2_ip:2380,etcd3=http://primary3_ip:2380,dr_etcd_node=http://dr_server_ip:2380
+initial-cluster-state: existing
+initial-cluster-token: etcd-cluster
+
+**********************************************************************************************************************
+**********************************************************************************************************************
+-----------------------------------------------------------patroni installtion-------------------------------------------------------------------------
+
+sudo apt -y install python3 python3-pip python3-dev libpq-dev
+sudo pip3 install launchpadlib --upgrade setuptools psycopg2
+sudo apt -y install python3-etcd patroni
+sudo systemctl stop patroni
+sudo systemctl disable patroni
+sudo vi /etc/patroni/config.yml
+
+ ls -l /etc/patroni/config.yml
+ sudo chmod 644 /etc/patroni/config.yml
+ systemctl start patroni
+ systemctl status patroni
+ 
+ ==========>>>>>>>>
+ 
+10.11.3.21  aemlhesdbn1dcvm1
+10.11.3.22  aemlhesdbn2dcvm2
+10.11.3.23  aemlhesdbn3dcvm3
+
+
+ create patroni config file in all node:-  
+ 
+vi /etc/patroni/config.yml
+ 
+scope: pg_cluster
+namespace: /service/
+name: CDBTESTDRSERVER3 
+
+restapi:
+    listen: 10.10.3.121:8008
+    connect_address: 10.10.3.121:8008
+
+etcd:
+    hosts: 10.10.3.122:2379,10.10.3.135:2379,10.10.3.140:2379
+	#hosts: 10.10.3.123:2379,10.10.3.131:2379,10.10.3.121:2379
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    synchronous_mode: false
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+      parameters:
+
+  initdb:
+  - encoding: UTF8
+  - data-checksums
+
+  pg_hba:
+  - host replication replicator 127.0.0.1/24 trust
+  - host replication replicator  10.10.3.122/32 trust
+  - host replication replicator 10.10.3.135/32 trust
+  - host replication replicator 10.10.3.140/32 trust
+  - host replication replicator 10.10.3.123/32 trust
+  - host replication replicator 10.10.3.131/32 trust
+  - host replication replicator 10.10.3.121/32 trust
+  - host all all 0.0.0.0/0 trust
+
+  users:
+    admin:
+      password: admin
+      options:
+        - createrole
+        - createdb
+
+postgresql:
+  listen: 10.10.3.121:4702
+  connect_address: 10.10.3.121:4702
+  data_dir: /data/patroni
+  bin_dir: /usr/lib/pgsql-15.6/bin/
+  pgpass: /tmp/pgpass
+  authentication:
+    replication:
+      username: replicator
+      password: replicator
+    superuser:
+      username: postgres
+      password: India@123456
+
+tags:
+    nofailover: true
+    noloadbalance: false
+    clonefrom: false
+    nosync: false
+	
+**********************************************************************************************************************
+**********************************************************************************************************************
+create this user in master node:-
+ 
+ 
+ alter user postgres with password 'India@123456';
+ 
+ create user admin with createdb createrole password 'admin';
+ 
+  create user admin with login password 'admin';
+ 
+ 
+ create user replicator with replication password 'replicator';
+ 
+ SELECT * FROM pg_create_physical_replication_slot('vzhesdbn2dcvm2');
+ 
+ 
+ node1 :- create repliaction slots
+ 
+ 
+ patronictl -c /etc/patroni/config.yml restart pg_cluster1
+ 
+ patronictl -c /etc/patroni/config.yml list
+
+
+
+*************************************************************************************************************************
+**************************************************************************************************************************
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+change the configuration file in master
+
+vi postgresql.conf
+
+# Do not edit this file manually!
+# It will be overwritten by Patroni!
+include 'postgresql.base.conf'
+
+cluster_name = 'pg_cluster'
+hot_standby = 'on'
+listen_addresses = '10.10.195.22'
+log_autovacuum_min_duration = '0'
+log_checkpoints = 'True'
+log_connections = 'True'
+log_destination = 'stderr'
+log_directory = 'pg_log'
+log_disconnections = 'True'
+log_error_verbosity = 'default'
+log_filename = 'postgresql-%F_%a_%H.log'
+log_hostname = 'False'
+log_line_prefix = '%t [%p]: [%l-1] db=%d,user=%u'
+log_lock_waits = 'True'
+log_min_duration_statement = '1s'
+log_min_error_statement = 'error'
+log_min_messages = 'warning'
+log_rotation_age = '60'
+log_rotation_size = '1GB'
+log_temp_files = '0'
+log_truncate_on_rotation = 'True'
+logging_collector = 'True'
+max_connections = '1000'
+max_locks_per_transaction = '64'
+max_prepared_transactions = '0'
+max_replication_slots = '10'
+max_wal_senders = '10'
+max_worker_processes = '8'
+port = '4702'
+track_commit_timestamp = 'off'
+wal_keep_size = '10GB'
+wal_level = 'replica'
+wal_log_hints = 'on'
+hba_file = '/data/patroni/pg_hba.conf'
+ident_file = '/data/patroni/pg_ident.conf'
+
+# recovery.conf
+recovery_target = ''
+recovery_target_lsn = ''
+recovery_target_name = ''
+recovery_target_time = ''
+recovery_target_timeline = 'latest'
+recovery_target_xid = ''
+
+10.10.131.105
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+change the configuration file in master
+
+
+vi pg_hba.conf
+
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+
+# "local" is for Unix domain socket connections only
+local   all             all                                     trust
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            trust
+# IPv6 local connections:
+host    all             all             ::1/128                 trust
+# Allow replication connections from localhost, by a user with the
+# replication privilege.
+local   replication     all                                     trust
+host    replication     all             127.0.0.1/32            trust
+host    replication     all             ::1/128                 trust
+
+host replication all 127.0.0.1/32 trust
+host replication all 10.11.3.21/32 trust
+host replication all 10.11.3.23/32 trust
+host replication all 10.11.3.22/32 trust
+host all all 0.0.0.0/0 trust
+
+host replication all 127.0.0.1/32 trust
+host replication all  10.10.3.122/32 trust
+host replication all  10.10.3.135/32 trust
+host replication all  10.10.3.140/32 trust
+host replication all  10.10.3.123/32 trust
+host replication all  10.10.3.131/32 trust
+host replication all  10.10.3.121/32 trust
+host all all 0.0.0.0/0 trust
+----------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------troubleshoot----------------------------------------------------------------
+  
+connect string:-
+
+#primary_conninfo = 'user=postgres passfile=/tmp/pgpass host=10.10.99.138 port=4702 sslmode=prefer application_name=hesdbn1dcvm1 gssencmode=prefer channel_binding=prefer'
+#primary_slot_name = 'hesdbn1dcvm1'
+
+
+
+pg_basebackup -h 192.168.0.28 -U replicator -p 5432 -D $PGDATA -P -Xs -R
+
+/usr/lib/pgsql-15.6/bin/pg_basebackup -D /data/postgresql-15/data -h 10.10.131.101   -U replicator  -p 5432 -Xs -R -P -v
+
+
+
+patronictl -c /etc/patroni/config.yml list
+
+pg_controldata /data/patroni | grep "Latest checkpoint's TimeLineID"
+
+/var/lib/postgresql# /usr/lib/pgsql-15.6/bin/pg_controldata -D /data/postgresql-15/data
+
+
+patronictl -c /etc/patroni/config.yml restart vzhesdbn1dcvm1 --force --pending
+
+
+/usr/lib/pgsql-15.6/bin/pg_resetwal -f /data/postgresql-15/data
+
+
+patronictl -c /etc/patroni/postgres.yml edit-config pg_clusters
+----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+NOTE:-
+for patroni salve setup node:- we delete all file in data dirctory and start patroni service
+
+---------------------------	
+***************************************************************************************************************************
+*************************************************************************************************************************
+--------------------------------------------------------------Extension-------------------------------------------------------
+git clone https://github.com/pgpartman/pg_partman.git
+ 
+git clone https://github.com/citusdata/pg_cron.git
+
+cd /data/postgresql-15/postgresql-15.7/contrib/
+
+make && make install
+
+------------------uuid
+sudo apt-get update
+sudo apt-get install uuid-dev libossp-uuid-dev build-essential
+ 
+cd /path/to/postgresql-15.6
+./configure --prefix=/usr/lib/pgsql-15.6 --with-uuid=e2fs  # Or --with-uuid=ossp if using OSSP UUID
+ 
+ 
+cd /data/postgresql-15/postgresql-15.7/contrib/uuid-ossp
+ 
+make && make install
+ 
+ 
+create extension "uuid-ossp";
+
+
+if you want to reconfigure again bin directory:- 
+
+make clean
+
+pg_cron   
+pg_partman
+plpgsql   
+uuid-ossp 
+
+
+
+*****************************************************************************************************************************
+****************************************************************************************************************************
+------------------------------For change the parameters-----------------------------------------------
+su - postgres:
+ 
+patronictl -c /etc/patroni/config.yml edit-config pg_cluster
+patronictl -c /etc/patroni/config.yml restart pg_cluster
+
+root:
+systemctl restart patroni.service
+*******************************************************************************************************************
+*********************************************************************************************************************
+SELECT xmlcomment('hello');
+
+
+
+
+
+ patronictl -c /etc/patroni/config.yml switchover
+  patronictl -c /etc/patroni/config.yml list
+  
+  
+  
+  
+#-----------------------------------------------------------------------------
+#PG_CRON
+#-----------------------------------------------------------------------------
+cron.timezone='Asia/Kolkata'
+#cron.log_statement = 'all'
+#cron.database_name = 'postgres'
+
+
+-------------------------------for replication
+
+change in etcd & config.yml file
+
+adani_hesdbn1dcvm1-dr=http://10.31.208.9:2380,adani_hesdbn2dcvm2-dr=http://10.31.208.8:2380,adani_hesdbn3dcvm3-dr=http://10.31.208.7:2380
+
+patroni1=http://10.31.208.9:2380,patroni2=http://10.31.208.8:2380,patroni3=http://10.31.208.9:2380,
+
+10.10.66.42	patroni1
+10.10.66.69	patroni2
+10.10.66.132	patroni3
+
+
+10.31.208.9	adani_hesdbn1dcvm1-dr
+10.31.208.8	adani_hesdbn2dcvm2-dr
+10.31.208.7	adani_hesdbn3dcvm3-dr
+
+
+
+
+
+10.31.208.9:2379,10.31.208.8:2379,10.31.208.7:2379
+
+
+
+export PATH=/usr/lib/pgsql-15.6/bin:$PATH
+export PGDATA=/data/patroni
+export PGPORT=4702
+export PGDATABASE=postgres
+export PGHOST=/tmp
+
+
+export PATH=/usr/lib/postgresql/15/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+
+export: `/usr/lib/postgresql/15/bin/:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin'
+
+
+cd /etc/ssl/certs/
+chmod -R 0600 certs/
+chmod -R 0600 private/
+systemctl restart patroni.service
+systemctl status patroni.service
+sudo chmod 600 /etc/ssl/certs/
+sudo chown postgres:postgres /etc/ssl/certs/
+systemctl restart patroni.service
+systemctl status patroni.service
+cd /data/patroni/
+vi postgresql.base.conf
+sudo chown postgres:postgres /etc/ssl/private/ssl-cert-snakeoil.key
+systemctl restart patroni.service
+systemctl status patroni.service
+cd /etc/
+ll
+chmod -R 750 ssl/
+systemctl restart patroni.service
+systemctl status patroni.service
+chmod -R 0600  /etc/ssl/private/ssl-cert-snakeoil.key
+
+
+-rw------- 1 root     ssl-cert 1704 Oct 27  2023 ssl-cert-snakeoil.key
+
+
+chmod ssl 750
+

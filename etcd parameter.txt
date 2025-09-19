@@ -1,0 +1,65 @@
+Explanation of the Parameters
+1.ttl: 30 (Time-to-Live)
+Purpose: Specifies the lease duration (in seconds) for the current node in the DCS (Distributed Configuration Store, e.g., etcd).
+
+Effect: If a node fails to renew its lease within this period, the DCS considers the node dead and triggers a failover.
+
+
+Default Recommendation:
+30 seconds is reasonable in most setups.
+Lower values (e.g., 10) can lead to unnecessary failovers if there are minor network disruptions or delays.
+For a setup with network instability, consider increasing this to 30-60 seconds.
+
+=========================================
+
+2.loop_wait: 10
+Purpose: The interval (in seconds) at which Patroni polls the DCS to check the cluster state.
+
+Effect:
+A lower value (like 10) ensures quicker detection of state changes but increases network traffic.
+A higher value reduces load on the DCS but may delay detecting failovers.
+
+Default Recommendation: 10 seconds is standard for most setups. Adjust to 20-30 seconds if the cluster experiences frequent timeouts due to network issues.
+
+
+====================================================================
+3.retry_timeout: 10
+Purpose: The maximum time (in seconds) Patroni waits to retry after a failed operation (e.g., updating the DCS, acquiring a lock).
+
+Effect:
+If this is too low, transient issues may cause Patroni to give up prematurely.
+Setting it higher allows Patroni more time to handle temporary network or system hiccups.
+
+Default Recommendation: Increase this to 30 seconds for unstable networks or high-latency environments.
+
+============================================================
+
+Why These Adjustments Help
+
+Increased ttl reduces the likelihood of false failovers in unstable networks.
+
+Increased retry_timeout gives Patroni more time to recover from transient failures.
+
+Adjusted loop_wait reduces the frequency of interactions with the DCS, alleviating load and timeouts.
+
+
+=========================================================
+Recommendation:-
+
+ttl: 60
+loop_wait: 20
+retry_timeout: 30
+
+
+============================================================
+
+
+ETCD_HEARTBEAT_INTERVAL =500
+ETCD_ELECTION_TIMEOUT =5000
+snapshot-count=100000
+
+etcdctl --endpoints=http://localhost:2379 get /etcd/config --prefix
+
+
+failed to send out heartbeat on time (exceeded the 2s timeout for 21.38573272s, to 76fc4e83d1fa524a)
+server is likely overloaded

@@ -1,0 +1,45 @@
+
+wget https://ftp.postgresql.org/pub/source/v15.6/postgresql-15.6.tar.gz
+
+
+
+mkdir -p  /usr/lib/pgsql-15.6.0
+
+  apt-get install libreadline-dev -y
+  apt install build-essential -y
+  apt install zlib1g-dev -y
+  sudo apt-get install libldap2-dev
+  sudo apt-get install libxml2
+  sudo apt autoremove
+  sudo apt-get install libxml2 -y
+  apt-get install libxml2-dev -y
+  sudo apt-get install libxslt-dev -y
+  
+
+./configure --prefix=/usr/lib/pgsql-15.6.0  --with-ldap --with-libxml --with-libxslt 
+
+./configure --prefix=/usr/lib/pgsql-15.6  --with-ldap --with-libxml --with-libxslt
+
+make
+make install
+
+mv /usr/lib/pgsql-15.6 /usr/lib/pgsql-15.6.1
+
+
+mv /usr/lib/pgsql-15.6.0 /usr/lib/pgsql-15.6
+
+
+SELECT xmlcomment('hello');
+
+
+error:- 
+
+gcc: fatal error: cannot read spec file ‘./specs’: Is a directory
+
+sol:- 
+
+unset C_INCLUDE_PATH
+unset LIBRARY_PATH
+unset CPATH
+unset CFLAGS
+unset LDFLAGS

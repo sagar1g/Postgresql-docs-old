@@ -1,0 +1,219 @@
+Step 1: Prepare Primary Cluster (DC1)
+sudo apt -y install etcd
+sudo systemctl stop etcd
+sudo rm -rf /var/lib/etcd/default
+sudo mv /etc/default/etcd /etc/default/etcd-orig
+cd ~
+vi /etc/hosts
+sudo systemctl start etcd
+systemctl enable etcd
+systemctl status  etcd
+systemctl status etcd.service
+
+vi  /etc/default/etcd
+name: etcd1
+data-dir: /var/lib/etcd
+initial-cluster-state: new
+initial-cluster-token: etcd-cluster-1
+initial-cluster: etcd1=http://etcd1:2380,etcd2=http://etcd2:2380,etcd3=http://etcd3:2380
+initial-advertise-peer-urls: http://etcd1:2380
+advertise-client-urls: http://etcd1:2379
+listen-peer-urls: http://0.0.0.0:2380
+listen-client-urls: http://0.0.0.0:2379
+
+
+ETCD_NAME=dr2
+ETCD_DATA_DIR="/var/lib/etcd/dr2"
+ETCD_LISTEN_PEER_URLS="http://192.168.29.57:2380"
+ETCD_LISTEN_CLIENT_URLS="http://192.168.29.57:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.29.57:2380"
+ETCD_INITIAL_CLUSTER="dr=http://192.168.29.160:2380,dr1-virtual-machine=http://192.168.29.57:2380"
+ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_ADVERTISE_CLIENT_URLS="http://192.168.29.57:2379"
+ETCD_ENABLE_V2="true"
+
+ETCD_NAME=dr2
+ETCD_DATA_DIR="/var/lib/etcd/dr2"
+ETCD_LISTEN_PEER_URLS="http://192.168.29.57:2380"
+ETCD_LISTEN_CLIENT_URLS="http://192.168.29.57:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://192.168.29.57:2380"
+ETCD_INITIAL_CLUSTER="dc-1=http://10.11.3.21:2380,dc2=http://192.168.29.124:2380,dr=http://192.168.29.160:2380,dr1-virtual-machine=http://192.168.29.57:2380"
+ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_ADVERTISE_CLIENT_URLS="http://192.168.29.57:2379"
+ETCD_ENABLE_V2="true"
+
+
+Primary Cluster Patroni Configuration:
+
+
+
+Create the Patroni configuration file (/etc/patroni/patroni.yml) for the primary data center nodes (pg-primary, pg-replica1, pg-replica2).
+Example for pg-primary:
+
+
+
+scope: pg_cluster
+namespace: /service/
+name: pg-primary
+
+etcd:
+  host: etcd1:2379,etcd2:2379,etcd3:2379
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+      parameters:
+        max_connections: 100
+        max_locks_per_transaction: 64
+        max_worker_processes: 8
+        wal_level: replica
+        hot_standby: "on"
+        wal_log_hints: "on"
+        archive_mode: "on"
+        archive_command: '/bin/true'
+        max_wal_senders: 10
+        max_replication_slots: 10
+        synchronous_commit: "local"
+        synchronous_standby_names: '*'
+
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+  pg_hba:
+    - host replication repl_user 0.0.0.0/0 md5
+    - host all all 0.0.0.0/0 md5
+
+  users:
+    admin:
+      password: admin_pass
+      options:
+        - createrole
+        - createdb
+
+postgresql:
+  listen: 0.0.0.0:5432
+  connect_address: pg-primary:5432
+  data_dir: /var/lib/postgresql/13/main
+  config_dir: /etc/postgresql/13/main
+  bin_dir: /usr/lib/postgresql/13/bin
+  authentication:
+    replication:
+      username: repl_user
+      password: repl_pass
+    superuser:
+      username: postgres
+      password: postgres_pass
+  parameters:
+    unix_socket_directories: '/var/run/postgresql'
+
+tags:
+  nofailover: false
+  noloadbalance: false
+  clonefrom: false
+  nosync: false
+
+
+
+Create Replication Slot on Primary Node:
+
+SELECT * FROM pg_create_physical_replication_slot('patroni');
+
+
+
+
+
+Step 2: Prepare Standby Cluster (DC2)
+
+
+scope: pg_standby_cluster
+namespace: /service/
+name: pg-standby
+
+etcd:
+  host: etcd4:2379,etcd5:2379,etcd6:2379
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+      parameters:
+        max_connections: 100
+        max_locks_per_transaction: 64
+        max_worker_processes: 8
+        wal_level: replica
+        hot_standby: "on"
+        wal_log_hints: "on"
+        archive_mode: "on"
+        archive_command: '/bin/true'
+        max_wal_senders: 10
+        max_replication_slots: 10
+        synchronous_commit: "local"
+        synchronous_standby_names: '*'
+    standby_cluster:
+      host: pg-primary:5432
+      primary_slot_name: patroni
+      create_replica_methods:
+        - basebackup
+
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+  pg_hba:
+    - host replication repl_user 0.0.0.0/0 md5
+    - host all all 0.0.0.0/0 md5
+
+  users:
+    admin:
+      password: admin_pass
+      options:
+        - createrole
+        - createdb
+
+postgresql:
+  listen: 0.0.0.0:5432
+  connect_address: pg-standby:5432
+  data_dir: /var/lib/postgresql/13/main
+  config_dir: /etc/postgresql/13/main
+  bin_dir: /usr/lib/postgresql/13/bin
+  authentication:
+    replication:
+      username: repl_user
+      password: repl_pass
+    superuser:
+      username: postgres
+      password: postgres_pass
+  parameters:
+    unix_socket_directories: '/var/run/postgresql'
+
+tags:
+  nofailover: false
+  noloadbalance: false
+  clonefrom: false
+  nosync: false
+
+
+Step 3: Configure Cross-Data Center Communication
+
+Update postgresql.conf:
+
+Ensure that the postgresql.conf file on the standby leader (pg-standby) includes
+
+primary_conninfo = 'host=pg-primary port=5432 user=repl_user password=repl_pass target_session_attrs=read-write'
+primary_slot_name = 'patroni'
+
+

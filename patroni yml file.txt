@@ -1,0 +1,63 @@
+scope: pg_cluster
+namespace: /service/
+name: patroni_node1
+
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: 192.168.1.10:8008
+
+etcd:
+  hosts: 192.168.1.11:2379,192.168.1.12:2379,192.168.1.13:2379
+
+bootstrap:
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+    maximum_lag_on_failover: 1048576  # 1MB
+
+    postgresql:
+      use_pg_rewind: true
+      parameters:
+        max_connections: 100
+        shared_buffers: 1GB
+        max_worker_processes: 8
+
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+  pg_hba:
+    - host replication replicator 0.0.0.0/0 md5
+    - host all all 0.0.0.0/0 md5
+
+postgresql:
+  listen: 0.0.0.0:5432
+  connect_address: 192.168.1.10:5432
+  data_dir: /var/lib/postgresql/15/main
+  bin_dir: /usr/lib/postgresql/15/bin
+  authentication:
+    replication:
+      username: replicator
+      password: repl_pass
+    superuser:
+      username: postgres
+      password: super_pass
+  parameters:
+    wal_level: replica
+    hot_standby: "on"
+    max_replication_slots: 5
+    max_wal_senders: 5
+
+log:
+  level: INFO                     # Logging level: DEBUG, INFO, WARNING, ERROR, or CRITICAL
+  format: '%(asctime)s %(levelname)s: %(message)s'  # Log format
+  datefmt: '%Y-%m-%d %H:%M:%S'    # Date format for log messages
+  file_num: 5                     # Number of log files to retain (when using log_file)
+  file_size: 10000000             # Maximum size of a log file in bytes (10 MB)
+  log_file: /var/log/patroni.log  # Path to log file (make sure Patroni has write permissions)
+
+watchdog:
+  mode: automatic
+  device: /dev/watchdog
+  safety_margin: 5

@@ -1,0 +1,163 @@
+apt install firewalld -y
+
+firewall-cmd --permanent --add-service=high-availability
+firewall-cmd --add-service=high-availability
+firewall-cmd --permanent --add-service=postgresql
+firewall-cmd --add-service=postgresql
+
+vi /etc/hosts                                                                      192.168.122.50 pgsql-vip
+
+10.10.66.101 pgsql-vip
+10.10.66.160 pafdb1
+10.10.66.179 pafdb2
+10.10.66.167 pafdb3
+
+
+for s in pafdb1 pafdb2 pafdb3; do ping -W1 -c1 $s; done| grep icmp_seq
+
+
+sudo sh -c 'echo "deb https://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+
+wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+
+sudo apt-get update
+
+sudo apt-get -y install postgresql-15
+
+
+apt-get install pacemaker -y
+apt-get install resource-agents -y
+apt-get install resource-agents-paf  -y
+apt-get install pcs -y
+ apt-get install fence-agents* -y
+ 
+ 
+ replication:- 
+ 
+ 
+1.archive_mode=on
+2.archive_command = 'cp %p /AumShanti/pgdatabase/archive/%f'----------------cp %p /app/archive/%f  
+3.max_wal_sender = 10 --------------------(wal_keep_size = 50MB ----postgresql-15)
+4.wal_level = repllica
+5.wal_keep_segments = 50
+6.wal_log_hint = on
+7.hot_standby = on
+8.listen_address = *
+
+
+ipv4:-
+host   all     all   10.10.66.179/32   trust
+host   all     all   10.10.66.167/32   trust
+
+replication:-
+host  replication postgres 10.10.66.179/32   trust
+
+host  replication postgres 10.10.66.167/32   trust
+
+host replication postgres 10.10.66.101/32    reject
+
+
+
+select now() -pg_last_xact_replay_timestamp() as replication_lag;
+
+
+select *  from pg_stat_wal_receiver;
+
+
+pg_basebackup -D /var/lib/postgresql/15/main -h 10.10.66.160 -p 5432 -Xs -R -P
+
+
+
+systemctl stop  postgresql@15-main.service
+
+
+ systemctl stop postgresql.service
+ 
+ 
+ ip addr del 10.10.66.101/24 dev eth0  --------------server1
+ 
+ 
+ systemctl disable corosync # important!
+systemctl disable pacemaker
+
+
+passwd hacluster
+redhat123
+
+
+systemctl enable pcsd
+systemctl start pcsd
+
+
+
+
+pcs host auth  -u hacluster -p redhat123  pafdb1 pafdb2 pafdb3
+
+
+pcs cluster setup  cluster_pgsql --start  node1.pafdb1 node2.pafdb2 node3.pafdb3
+
+
+pcs cluster start --all
+pcs cluster status 
+
+pcs resource defaults migration-threshold=5
+pcs resource defaults resource-stickiness=10
+
+
+ssh-keygen
+ssh-copy-id test@10.10.66.179
+ssh-copy-id test@10.10.66.160
+ssh-copy-id test@10.10.66.167
+
+
+pcs cluster cib fencing.xml
+pcs -f fencing.xml stonith create fence_vm_pafdb1 fence_virsh \
+  pcmk_host_check="static-list" pcmk_host_list="pafdb1"        \
+  ipaddr="10.10.66.160" login="test" port="pafdb1-c7"       \
+  identity_file="/root/.ssh/id_rsa"
+
+pcs -f fencing.xml stonith create fence_vm_srv2 fence_virsh \
+  pcmk_host_check="static-list" pcmk_host_list="pafdb2"        \
+  ipaddr="10.10.66.179" login="test" port="pafdb2-c7"       \
+  identity_file="/root/.ssh/id_rsa"
+
+pcs -f fencing.xml stonith create fence_vm_srv3 fence_virsh \
+  pcmk_host_check="static-list" pcmk_host_list="pafdb3"        \
+  ipaddr="10.10.66.167" login="test" port="pafdb3-c7"       \
+  identity_file="/root/.ssh/id_rsa"
+
+pcs -f fencing.xml constraint location fence_vm_srv1 avoids pafdb1=INFINITY
+pcs -f fencing.xml constraint location fence_vm_srv2 avoids pafdb2=INFINITY
+pcs -f fencing.xml constraint location fence_vm_srv3 avoids pafdb3=INFINITY
+pcs cluster cib-push scope=configuration fencing.xml
+
+
+
+pcs cluster cib cluster1.xml
+
+
+# pgsqld
+pcs -f cluster1.xml resource create pgsqld ocf:heartbeat:pgsqlms \
+    bindir=/usr/lib/postgresql/15/bin                                   \
+    pgdata=/var/lib/postgresql/15/main                               \
+    op start timeout=60s                                         \
+    op stop timeout=60s                                          \
+    op promote timeout=30s                                       \
+    op demote timeout=120s                                       \
+    op monitor interval=15s timeout=10s role="Master"            \
+    op monitor interval=16s timeout=10s role="Slave"             \
+    op notify timeout=60s
+
+# pgsql-ha
+pcs -f cluster1.xml resource master pgsql-ha pgsqld notify=true
+
+pcs -f cluster1.xml resource create pgsql-pri-ip ocf:heartbeat:IPaddr2 \
+    ip=10.10.66.179 cidr_netmask=24 op monitor interval=10s
+	
+pcs -f cluster1.xml constraint colocation add pgsql-pri-ip with master pgsqld INFINITY
+pcs -f cluster1.xml constraint order promote pgsqld then start pgsql-pri-ip symmetrical=false kind=Mandatory
+pcs -f cluster1.xml constraint order demote pgsqld then stop pgsql-pri-ip symmetrical=false kind=Mandatory
+
+
+ pcs -f cluster1.xml resource promotable pgsqld notify=true
+ pcs -f cluster1.xml resource promotable pgsql-ha pgsqld notify=true

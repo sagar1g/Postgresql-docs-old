@@ -1,0 +1,171 @@
+vi /etc/hosts
+
+127.0.0.1 localhost
+10.86.0.196 db-node2
+10.86.0.162 db-node1
+
+
+
+10.86.0.126  lb-node1-1
+10.86.0.171  lb-node1-2
+
+
+
+ ssh-keygen
+ ssh lb-node1-2
+ cd .ssh
+ vi authorized_keys
+ cat id_rsa.pub
+ ssh dblb1
+ cd
+ apt install haproxy
+ cp /etc/haproxy/haproxy.cfg /etc/haproxy/haproxy.cfg.bak
+ vi /etc/haproxy/haproxy.cfg
+ ip a
+ vi /etc/haproxy/haproxy.cfg
+ cat /etc/haproxy/haproxy.cfg
+ telnet 10.10.66.42 6432
+ telnet 10.10.66.42 8008
+ telnet 10.10.66.100 7000
+ ping 10.10.66.100
+ cat /etc/hosts
+ telnet 10.10.66.42 7000
+ vi /etc/haproxy/haproxy.cfg
+
+apt install postgresql-client-15
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+vi /etc/haproxy/haproxy.cfg
+
+global
+     log 127.0.0.1   local2
+     log /dev/log    local0
+     log /dev/log    local1 notice
+     chroot /var/lib/haproxy
+     stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+     stats timeout 30s
+     user haproxy
+     group haproxy
+     maxconn 5000
+     daemon
+
+defaults
+    mode                    tcp
+    log                     global
+    option                  tcplog
+    retries                 5
+    timeout queue           5m
+    timeout connect         120s
+    timeout client          30m
+    timeout server          30m
+    timeout check           30s
+    maxconn                 5000
+    timeout http-request    20s
+timeout http-keep-alive     10s
+timeout tunnel              2m
+timeout client-fin          1s
+timeout server-fin          1s
+
+listen stats
+    mode http
+    bind *:7000
+    stats enable
+    stats uri /
+
+listen primary
+    bind *:4702
+    mode tcp
+    option httpchk OPTIONS /master
+    http-check expect status 200
+    option tcpka
+    default-server inter 60s fall 3 rise 2 on-marked-down shutdown-sessions
+    server db-node1 10.86.0.162:4702 maxconn 5000 check port 8008
+    server db-node2 10.86.0.196:4702 maxconn 5000 check port 8008
+    
+
+
+listen standby
+    bind *:5001
+    mode tcp
+    balance roundrobin
+    option httpchk OPTIONS /replica
+    http-check expect status 200
+    #default-server inter 60s fall 3 rise 2 on-marked-down shutdown-sessions
+    server db-node1 10.86.0.162:4702 maxconn 5000 check port 8008
+    server db-node2 10.86.0.196:4702 maxconn 5000 check port 8008
+
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+global
+     log 127.0.0.1   local2
+     log /dev/log    local0
+     log /dev/log    local1 notice
+     chroot /var/lib/haproxy
+     stats socket /run/haproxy/admin.sock mode 660 level admin expose-fd listeners
+     stats timeout 30s
+     user haproxy
+     group haproxy
+     maxconn 3000
+     daemon
+
+defaults
+
+mode tcp
+          log global
+          retries 3
+          timeout queue 1m
+          timeout connect 10s
+          timeout client 31m #Recommended value: Greater than session timeout value
+          timeout server 31m #Recommended value: Greater than session timeout value
+          timeout check 10s
+          maxconn 3000
+
+listen stats
+    mode http
+    bind *:7000
+    stats enable
+    stats uri /
+
+listen primary
+    bind *:4702
+    mode tcp
+    option httpchk OPTIONS /master
+    http-check expect status 200
+    default-server inter 60s fall 3 rise 2 on-marked-down shutdown-sessions
+    server hesdbn1dcvm1 10.10.163.21:4702 maxconn 3000 check port 8008
+    server hesdbn2dcvm2 10.10.163.22:4702 maxconn 3000 check port 8008
+    server hesdbn3dcvm3 10.10.163.23:4702 maxconn 3000 check port 8008
+
+
+
+
+listen standby
+    bind *:5001
+    mode tcp
+    balance roundrobin
+    option httpchk OPTIONS /replica
+    http-check expect status 200
+    #default-server inter 60s fall 3 rise 2 on-marked-down shutdown-sessions
+    server hesdbn1dcvm1 10.10.163.21:4702 maxconn 3000 check port 8008
+    server hesdbn2dcvm2 10.10.163.22:4702 maxconn 3000 check port 8008
+    server hesdbn3dcvm3 10.10.163.23:4702 maxconn 3000 check port 8008
+
+
+
+How does haproxy determine who is the primary and connect to the primary?
+
+Haproxy sends health-check probes to all patroni nodes it knows:
+
+8008 is the patroni rest api port.
+If node is running as a master, patroni will respond on request 'GET /' with http status code 200, in other case it will return 503.
+
+haproxy sends traffic only to the nodes which responding with 200.
+
+It is also possible to do read load balancing with haproxy, but for that it should do a different health-check: GET /replica
+    

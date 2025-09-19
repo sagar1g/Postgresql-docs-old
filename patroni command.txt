@@ -1,0 +1,88 @@
+patronictl edit-config
+
+patronictl -c /etc/patroni/config.yml edit-config
+------------------------------------------------------------------------------------------------------------------
+
+patronictl reload
+
+This command will reload parameters from configuration file and takes required action like restart on cluster nodes.
+
+When to use: If you have changed parameters in configuration file using edit-config you can use reload command for parameters to take effect
+
+ patronictl -c /etc/patroni/config.yml reload patroni_cluster
+ 
+---------------------------------------------------------------------------------------------------------------------------
+
+patronictl switchover
+
+patronictl -c /etc/patroni/config.yml switchover
+
+--------------------------------------------------------------------------------------------------------------------------------
+
+patronictl pause
+
+patronictl -c /etc/patroni/config.yml pause
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+patronictl resume
+
+patronictl -c /etc/patroni/config.yml resume
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------
+
+patronictl list
+
+patronictl -c /etc/patroni/config.yml list
+
+------------------------------------------------------------------------------------------------------------------------------------------------------
+
+patronictl restart
+
+When to use: Sometimes you need to restart all nodes in the cluster without downtime, you can use this command for rolling restart
+
+# Restart particular node in cluster
+patronictl -c /etc/patroni/config.yml restart <CLUSTER_NAME> <NODE_NAME>
+
+# Restart whole cluster(all nodes in cluster)
+patronictl -c /etc/patroni/config.yml restart <CLUSTER_NAME>
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------
+
+patronictl reinit
+
+When to use: patronictl reinit command allows you to reinitialize a specific node and can be utilized 
+when a cluster node experiences failure in starting or displays an unknown status for the node in the cluster . 
+It is often useful in cases where a node has corrupt data.
+
+patronictl -c /etc/patroni/config.yml reinit <CLUSTER_NAME> <NODE_NAME>
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Show Detailed Node Information:
+
+patronictl -c /path/to/patroni.yml status
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+However, as those settings manage shared memory, some extra care should be taken when restarting the nodes:
+
+--If you want to increase the value of any of those settings:
+
+1.Restart all standbys first
+
+2.Restart the primary after that
+
+---If you want to decrease the value of any of those settings:
+
+1.Restart the primary first
+
+2.Restart all standbys after that
+
+Note: if you attempt to restart all nodes in one go after decreasing the value of any of those settings, 
+Patroni will ignore the change and restart the standby with the original setting value, thus requiring that you restart the standbys again later. 
+Patroni does that to prevent the standby to enter in an infinite crash loop, because PostgreSQL quits with a FATAL message 
+if you attempt to set any of those parameters to a value lower than what is visible in pg_controldata on the Standby node. In other words, 
+we can only decrease the setting on the standby once its pg_controldata is up-to-date with the primary in regards to these changes on the primary.
+
+
+patronictl -c /etc/patroni/config.yml restart Assam_cluster hesdbn1dcvm1
