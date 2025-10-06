@@ -1,0 +1,15 @@
+**************************CONFIGURATION*******************************
+
+1)  SELECT * FROM pg_settings WHERE name = 'work_mem';
+
+2)postgres=# SELECT name, setting, reset_val, source
+ FROM pg_settings WHERE source = ‘session’;
+
+3) Show all setting in postgresql.conf file.
+postgres=# SELECT name, source, setting
+ FROM pg_settings
+ WHERE source != 'default'
+ AND source != 'override'
+ ORDER by 2, 1;
+
+4)

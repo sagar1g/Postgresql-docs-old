@@ -1,0 +1,32 @@
+
+1.Install Dependencies:
+
+sudo yum install gcc make unixODBC-devel
+
+2.Download the Source Code:
+
+https://ftp.postgresql.org/pub/odbc/versions/src/psqlodbc-15.00.0000.tar.gz
+
+tar -xvf psqlodbc-15.00.0000.tar.gz
+
+3.Compile and Install:
+
+./configure
+make
+make install
+
+4.Configure ODBC Data Source:
+
+vi /etc/odbc.ini
+
+[my_postgresql_db]
+Description = PostgreSQL ODBC Driver
+Driver = /usr/local/lib/psqlodbcw.so-------(binery path)
+Servername = localhost
+Database = your_database_name
+Port = 5432
+
+
+5.Test the Connection:
+
+isql -v my_postgresql_db username password
