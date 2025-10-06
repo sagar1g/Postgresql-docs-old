@@ -1,0 +1,141 @@
+
+GRANT CONNECT ON DATABASE "PRODPLFM" TO "finappuser";
+
+GRANT USAGE ON SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "finappuser";
+
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "finappuser";
+
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "finappuser";
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+--- Set Default Privileges for a Role:
+ 
+1.  You can set default privileges for a role so 
+    that any objects created by this role will have the specified permissions.
+
+command:- 
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA your_schema
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO your_role;
+
+
+2. This command ensures that any new tables created in the specified schema will automatically 
+   have the SELECT, INSERT, UPDATE, and DELETE permissions granted to your_role.
+
+
+---------- Set Default Privileges for a Specific User:-
+
+1. You can also specify default privileges for objects created by a specific user.
+
+command:- 
+
+ALTER DEFAULT PRIVILEGES FOR USER your_user IN SCHEMA your_schema
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO your_role;
+
+2. This command ensures that any new tables created in the specified schema by your_user 
+   will automatically have the specified permissions granted to your_role.
+
+
+-------------- Set Default Privileges for All Users:
+1. If you want to set default privileges for all users who create tables in a schema, you can do so without specifying a particular user.
+
+command:- 
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA your_schema
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO PUBLIC;
+
+2. This command ensures that any new tables created in the specified schema will automatically have the specified permissions granted to all users.
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+Revoke:-
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA bkp
+REVOKE SELECT, INSERT, UPDATE ,DELETE ON TABLES FROM pennantvendor;
+
+
+
+psql -h PROD-DB-PENNANT-ENCRYPTED-UPGRADED.CN0WXNKVPVCB.AP-SOUTH-1.RDS.AMAZONAWS.COM  -U proadmin -d postgres
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "pennantvendor";
+
+
+before-eod-prod-db-pennant-encrypted-upgraded-03-07-2024.cn0wxnkvpvcb.ap-south-1.rds.amazonaws.com
+
+
+GRANT SELECT ON view_name TO finappuser;
+
+C:\Program Files\PostgreSQL\15\bin
+
+==============================================================================================================
+
+CREATE USER "Aparna.bhilare.pcpl" WITH PASSWORD 'Aparna@123' VALID UNTIL '2024-08-15';
+
+ALTER USER myuser VALID UNTIL '2024-10-17';
+
+ALTER USER pennantuser VALID UNTIL '2024-10-17' PASSWORD 'Support@123';
+ALTER USER "nehajadhav.ext" VALID UNTIL '2024-07-17' PASSWORD 'Neha@1234';
+
+======================================================================
+ALTER DEFAULT PRIVILEGES IN SCHEMA your_schema
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO your_role;
+==========================================================================================
+
+check permission:-
+
+schema level:-  
+
+SELECT nspname AS schema_name,
+       pg_roles.rolname AS user_name,
+       has_schema_privilege(pg_roles.rolname, nspname, 'USAGE') AS has_usage,
+       has_schema_privilege(pg_roles.rolname, nspname, 'CREATE') AS has_create
+FROM pg_namespace, pg_roles
+WHERE rolname = 'username';
+
+Check Table-Level Permissions:- 
+
+SELECT grantee AS user_name,
+       table_schema,
+       table_name,
+       MAX(CASE WHEN privilege_type = 'SELECT' THEN 'YES' ELSE 'NO' END) AS can_select,
+       MAX(CASE WHEN privilege_type = 'INSERT' THEN 'YES' ELSE 'NO' END) AS can_insert,
+       MAX(CASE WHEN privilege_type = 'UPDATE' THEN 'YES' ELSE 'NO' END) AS can_update,
+       MAX(CASE WHEN privilege_type = 'DELETE' THEN 'YES' ELSE 'NO' END) AS can_delete
+FROM information_schema.role_table_grants
+WHERE table_schema = 'schema_name'
+  AND grantee = 'username'
+GROUP BY grantee, table_schema, table_name;
+
+
+SELECT grantee AS user_name,
+       table_schema,
+       table_name,
+       ARRAY_AGG(privilege_type) AS privileges
+FROM information_schema.role_table_grants
+WHERE table_schema = 'DL_EOM'
+  AND grantee = 'pennantvendor'
+GROUP BY grantee, table_schema, table_name;
+
+
+SELECT r.rolname AS user_name,
+       c.relname AS table_name,
+       has_table_privilege(r.rolname, c.oid, 'SELECT') AS can_select,
+       has_table_privilege(r.rolname, c.oid, 'INSERT') AS can_insert,
+       has_table_privilege(r.rolname, c.oid, 'UPDATE') AS can_update,
+       has_table_privilege(r.rolname, c.oid, 'DELETE') AS can_delete
+FROM pg_catalog.pg_roles r
+JOIN pg_catalog.pg_class c ON c.relowner = r.oid
+JOIN pg_catalog.pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = 'public'
+  AND r.rolname = 'john_doe'
+  AND c.relkind = 'r';
+
+
+
+
+
+ 

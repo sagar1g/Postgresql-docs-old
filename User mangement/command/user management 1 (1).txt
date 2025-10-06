@@ -1,0 +1,400 @@
+CREATE USER "Aparna.bhilare.pcpl" WITH PASSWORD 'Aparna@123' VALID UNTIL '2024-08-15';
+
+ALTER USER myuser VALID UNTIL '2024-10-17';
+
+ALTER USER pennantuser VALID UNTIL '2024-10-17' PASSWORD 'Support@123';
+ALTER USER "nehajadhav.ext" VALID UNTIL '2024-07-17' PASSWORD 'Neha@1234';
+
+
+anita.kurmi.pcpl
+Aparna.bhilare.pcpl
+mahesh.nayak.pcpl
+dattatrey.dongare.pcpl
+manjunatha.reddy.pcpl
+sanket.apte.pcpl
+ganeshkale.ext.pcpl
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON bkp.soa_diff_data_tranches_20250206 TO pennantvendor;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON  bkp.soa_tran_data_tranches_20250206 TO pennantvendor;
+
+
+
+
+
+
+SET search_path TO "DL_EOM";
+
+
+psql -U proadmin -h after-eod-prod-db-pennant-encrypted-upgraded-19-03-2025.cn0wxnkvpvcb.ap-south-1.rds.amazonaws.com -d PRODPLFM 
+
+PenAWSRDS$$124
+
+
+psql -U proadmin -h prod-db-pennant-encrypted-upgraded.cn0wxnkvpvcb.ap-south-1.rds.amazonaws.com -d PRODPLFM 
+
+
+psql -U proadmin -h before-eod-prod-db-pennant-encrypted-upgraded-06-04-2025.cn0wxnkvpvcb.ap-south-1.rds.amazonaws.com -d PRODPLFM 
+
+
+GRANT CONNECT ON DATABASE "PRODPLFM" TO "Aparna.bhilare.pcpl";
+GRANT USAGE ON SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "Aparna.bhilare.pcpl";
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "Aparna.bhilare.pcpl";
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "Aparna.bhilare.pcpl";
+
+
+GRANT CONNECT ON DATABASE csb TO db_csb;
+GRANT USAGE ON SCHEMA digital_collections TO db_csb;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA "hes" TO "Remith";
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL SEQUENCES IN SCHEMA digital_collections TO db_csb;
+
+
+PRODPLFM
+
+
+
+ DL_EOM
+ LeadSquared
+ PLF_DR
+ bkp
+ cron
+ magic
+ otherdata
+ plf
+ plfaudit
+ plfext
+ plfsnap
+ public
+ 
+ 
+ 
+ 
+ -------------------------------------------Read Only----------------------------------------
+ 
+ 
+ 
+ CREATE USER "ganeshkale.ext.pcpl" WITH PASSWORD 'Sanket@123' VALID UNTIL '2024-08-15';
+ 
+ 
+GRANT CONNECT ON DATABASE "PRODPLFM" TO "ganeshkale.ext.pcpl";
+GRANT USAGE ON SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "ganeshkale.ext.pcpl";
+GRANT SELECT ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "ganeshkale.ext.pcpl";
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "ganeshkale.ext.pcpl";
+
+================================view=================================================================
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON facilitydetails_view TO finappuser;
+GRANT SELECT, INSERT, UPDATE, DELETE ON finfeerefundheader_tview TO pennantvendor;
+
+
+
+SELECT * FROM pg_user WHERE usename="madhubabup.ext";
+
+
+ALTER USER "suhas.kadam" VALID UNTIL '2024-10-17' PASSWORD 'Suhas@1234';
+
+
+ALTER USER pennantuser VALID UNTIL '2024-10-17' PASSWORD 'Support@123';
+
+
+
+GRANT CONNECT ON DATABASE "PRODPLFM" TO "mahesh.nayak";
+GRANT USAGE ON SCHEMA "plf","plfaudit","plfsnap" TO "mahesh.nayak";
+GRANT SELECT ON ALL TABLES IN SCHEMA "plf","plfaudit","plfsnap" TO "mahesh.nayak";
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA "plf","plfaudit","plfsnap" TO "mahesh.nayak";
+
+
+==========================================================================================================================================
+
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "ritesh.ramane";
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "ritesh.ramane";
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "ritesh.ramane";
+
+
+
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "ritesh.ramane";
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "ritesh.ramane";
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "ritesh.ramane";
+
+REVOKE ALL PRIVILEGES ON DATABASE PRODPLFM FROM "ritesh.ramane";
+
+
+=============================================================================================================================
+
+
+REVOKE ALL PRIVILEGES ON DATABASE PRODPLFM from "madhubabup.ext"; 
+
+
+REVOKE SELECT ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "madhubabup.ext"; 
+
+
+REASSIGN OWNED BY "madhubabup.ext" TO proadmin; 
+DROP OWNED BY "madhubabup.ext";
+
+ALTER OWNED BY "madhubabup.ext" TO proadmin;
+DROP OWNED BY "madhubabup.ext" CASCADE;
+
+
+REVOKE USAGE ON SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "madhubabup.ext"; 
+
+
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" FROM "madhubabup.ext";
+
+
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "public" FROM "ritesh.ramane";
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "public" FROM "ritesh.ramane";
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA "public" FROM "ritesh.ramane";
+REVOKE ALL PRIVILEGES ON SCHEMA "public" FROM "ritesh.ramane";
+
+
+SET search_path TO "public";
+
+
+dropuser --if-exists "madhubabup.ext";
+
+DROP USER IF EXISTS "madhubabup.ext";
+
+
+ALTER USER "madhubabup.ext" VALID UNTIL 'infinity';
+
+
+REVOKE CONNECT ON DATABASE PRODPLFM FROM "madhubabup.ext";
+
+======================================================================================================================================
+
+============for future table
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA "hes" GRANT ALL PRIVILEGES ON TABLES TO "Remith";
+ALTER DEFAULT PRIVILEGES IN SCHEMA "hes" GRANT ALL PRIVILEGES ON SEQUENCES TO "Remith";
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA "hes" TO "Remith";
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "hes" TO "Remith";
+
+
+=======================================================================================================================================================
+
+================spacefice table =================================================
+
+SELECT 
+    table_name,
+    privilege_type,
+    has_table_privilege('hrushikesh.sawant', table_name, privilege_type) AS has_privilege
+FROM (
+    VALUES 
+        ('customer_retail_ed'),
+        ('customer_retail_ed_temp'),
+        ('customer_corp_ed'),
+        ('customer_corp_ed_temp'),
+        ('customer_sme_ed'),
+        ('customer_sme_ed_temp')) AS tables(table_name)
+CROSS JOIN (VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')) AS privileges(privilege_type);
+
+
+======================================================================================================
+view permission:- 
+
+To check premission:- 
+
+SELECT 
+    privilege_type, 
+    has_table_privilege('finappuser', 'a_test_view', privilege_type) AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
+
+
+SELECT 
+    'pennantvendor' AS user_name,
+    'facilitydetails_aview' AS view_name, 
+    privilege_type, 
+    CASE 
+        WHEN has_table_privilege('pennantvendor', 'facilitydetails_aview', privilege_type) 
+        THEN 'YES' 
+        ELSE 'NO' 
+    END AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
+
+
+premission granted:- 
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON facilitydetails_view TO finappuser;
+GRANT ALL  PRIVILEGES  ON facilitydetails_view TO "pennantvendor";
+
+
+to check view:- 
+
+SELECT table_schema AS schema_name,
+       table_name AS view_name
+FROM information_schema.views
+WHERE table_schema = 'plf'
+
+   (or)
+   
+\dv
+
+   (or)
+   
+SELECT grantee, privilege_type 
+FROM information_schema.role_table_grants 
+WHERE table_name = 'facilitydetails_aview';
+
+
+===========================================================================================================
+ORDER BY table_name;
+
+SELECT table_schema AS schema_name,
+       table_name AS view_name,
+       privilege_type,
+       grantee
+FROM information_schema.role_table_grants
+WHERE table_schema = 'plf' -- Replace with your schema name
+  AND table_name IN (
+      SELECT table_name 
+      FROM information_schema.views 
+      WHERE table_schema = 'plf'
+  )
+ORDER BY table_name, privilege_type, grantee;
+
+=================================================================================================================
+
+
+SELECT 
+    table_schema AS schema_name,
+    table_name AS view_name,
+    MAX(CASE WHEN privilege_type = 'SELECT' THEN grantee END) AS select_grantee,
+    MAX(CASE WHEN privilege_type = 'INSERT' THEN grantee END) AS insert_grantee,
+    MAX(CASE WHEN privilege_type = 'UPDATE' THEN grantee END) AS update_grantee,
+    MAX(CASE WHEN privilege_type = 'DELETE' THEN grantee END) AS delete_grantee
+FROM 
+    information_schema.role_table_grants
+WHERE 
+    table_schema = 'plf' -- Replace with your schema name
+    AND table_name IN (
+        SELECT table_name 
+        FROM information_schema.views 
+        WHERE table_schema = 'plf'
+    )
+GROUP BY 
+    table_schema, table_name
+ORDER BY 
+    table_name;
+
+
+SELECT 
+    table_schema AS schema_name,
+    table_name AS view_name,
+    MAX(CASE WHEN privilege_type = 'SELECT' THEN grantee END) AS select_grantee,
+    MAX(CASE WHEN privilege_type = 'INSERT' THEN grantee END) AS insert_grantee,
+    MAX(CASE WHEN privilege_type = 'UPDATE' THEN grantee END) AS update_grantee,
+    MAX(CASE WHEN privilege_type = 'DELETE' THEN grantee END) AS delete_grantee
+FROM 
+    information_schema.role_table_grants
+WHERE 
+    table_schema = 'bkp'  -- Replace with your schema name
+    AND grantee = 'pennantvendor'  -- Replace 'your_user' with the specific username
+    AND table_name IN (
+        SELECT table_name 
+        FROM information_schema.views 
+        WHERE table_schema = 'bkp'
+    )
+GROUP BY 
+    table_schema, table_name
+ORDER BY 
+    table_name;
+
+
+SELECT 
+    table_schema AS schema_name,
+    table_name AS view_name,
+    MAX(CASE WHEN privilege_type = 'SELECT' THEN 'YES' ELSE 'NO' END) AS select_privilege,
+    MAX(CASE WHEN privilege_type = 'INSERT' THEN 'YES' ELSE 'NO' END) AS insert_privilege,
+    MAX(CASE WHEN privilege_type = 'UPDATE' THEN 'YES' ELSE 'NO' END) AS update_privilege,
+    MAX(CASE WHEN privilege_type = 'DELETE' THEN 'YES' ELSE 'NO' END) AS delete_privilege
+FROM 
+    information_schema.role_table_grants
+WHERE 
+    table_schema = 'plfsnap'  -- Replace with your schema name
+    AND grantee = 'pennantvendor'  -- Replace 'your_user' with the specific username
+    AND table_name IN (
+        SELECT table_name 
+        FROM information_schema.views 
+        WHERE table_schema = 'plfsnap'
+    )
+GROUP BY 
+    table_schema, table_name
+ORDER BY 
+    table_name;
+
+
+
+
+SELECT 
+    table_schema AS schema_name,
+    table_name AS view_name,
+    privilege_type,
+    grantee
+FROM 
+    information_schema.role_table_grants
+WHERE 
+    table_schema = 'plfsnap'
+    AND table_name = 'vw_profectus_hunter_live'; -- Replace with your view name
+	
+	
+===============================================================================================================================
+
+
+-- Switch to the target database
+
+\c your_database_name
+ 
+-- Grant usage on schemas
+
+GRANT USAGE ON SCHEMA plf TO pennantvendor;
+
+GRANT USAGE ON SCHEMA plfaudit TO pennantvendor;
+
+GRANT USAGE ON SCHEMA bkp TO pennantvendor;
+
+=================================================================================================================================
+ 
+-- Grant read (SELECT) and write (INSERT, UPDATE, DELETE) permissions on all tables in the schemas
+
+GRANT CONNECT ON DATABASE "PRODPLFM" TO "ganeshkale.ext.pcpl";
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO appadmin;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA plfaudit TO pennantvendor;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA bkp TO pennantvendor;
+
+=================================================================================================================================
+ 
+-- Grant permissions for sequences in all schemas (if sequences are used)
+
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA plf TO pennantvendor;
+
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA plfaudit TO pennantvendor;
+
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA bkp TO pennantvendor;
+
+=====================================================================================================================================
+ 
+-- Ensure future tables and sequences in the schemas inherit the same permissions
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA plf GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO pennantvendor;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA plf GRANT USAGE, SELECT ON SEQUENCES TO pennantvendor;
+ 
+ALTER DEFAULT PRIVILEGES IN SCHEMA plfaudit GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO pennantvendor;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA plfaudit GRANT USAGE, SELECT ON SEQUENCES TO pennantvendor;
+ 
+ALTER DEFAULT PRIVILEGES IN SCHEMA bkp GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO pennantvendor;
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA bkp GRANT USAGE, SELECT ON SEQUENCES TO pennantvendor;
+
+=======================================================================================================================================
+
+ 

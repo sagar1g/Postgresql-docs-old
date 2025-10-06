@@ -1,0 +1,482 @@
+psql -U proadmin   -h before-eod-prod-db-pennant-encrypted-upgraded-08-01-2025.cn0wxnkvpvcb.ap-south-1.rds.amazonaws.com -d postgres  -w
+
+GRANT ALL PRIVILEGES ON VIEW facilitydetailsenquiry_view TO finappuser;
+
+GRANT ALL PRIVILEGES ON VIEW facilitydetails_view TO finappuser;
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON public.vw_pcpl_banking_dtl_scf TO magicxpauser;
+GRANT SELECT ON facilitydetailsenquiry_view TO finnappuser;
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON facilitydetails_view TO finappuser;
+GRANT SELECT, INSERT, UPDATE, DELETE ON facilitydetailsenquiry_view TO finappuser;
+
+\dv+ facilitydetails_view
+
+
+SELECT has_table_privilege('magicxpauser', 'vw_pcpl_banking_dtl_scf', 'SELECT','INSERT', 'UPDATE', 'DELETE');
+
+
+SELECT has_table_privilege('postgres', 'public.my_table', 'SELECT');
+SELECT has_table_privilege('magicxpauser', 'vw_pcpl_banking_dtl_scf', 'SELECT');
+
+SELECT 
+    privilege_type, 
+    has_table_privilege('magicxpauser', 'vw_pcpl_banking_dtl', privilege_type) AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
+
+
+SELECT 
+    table_name,
+    privilege_type,
+    has_table_privilege('hrushikesh.sawant', table_name, privilege_type) AS has_privilege
+FROM (
+    VALUES 
+        ('customer_retail_ed'),
+        ('customer_retail_ed_temp'),
+        ('customer_corp_ed'),
+        ('customer_corp_ed_temp'),
+        ('customer_sme_ed'),
+        ('customer_sme_ed_temp')) AS tables(table_name)
+CROSS JOIN (VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')) AS privileges(privilege_type);
+
+
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON bkp.soa_diff_data_tranches_20250206 TO pennantvendor;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON bkp.soa_tran_data_tranches_20250206 TO pennantvendor;
+
+
+
+
+
+SELECT 
+    privilege_type, 
+    has_table_privilege('pennantvendor', 'soa_tran_data_tranches_20250206', privilege_type) AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
+
+
+
+1.customer_retail_ed
+
+2. customer_retail_ed_temp
+
+3. customer_corp _ed
+
+4. customer_corp _ed_temp
+
+5. customer_sme _ed
+
+6. customer_sme _ed_temp
+
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON plf.customer_retail_ed,plf.customer_retail_ed_temp,plf.customer_corp_ed,plf.customer_corp _ed_temp,plf.customer_sme_ed,plf.customer_sme_ed_temp TO "hrushikesh.sawant";
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON bkp.customer_retail_ed,bkp.customer_retail_ed_temp,bkp.customer_corp _ed, bkp.customer_corp _ed_temp,bkp.customer_sme _ed,bkp.customer_sme _ed_temp TO "hrushikesh.sawant";
+
+
+
+plf, bkp
+
+
+GRANT USAGE ON SCHEMA plf TO "hrushikesh.sawant";
+GRANT USAGE ON SCHEMA bkp TO "hrushikesh.sawant";
+ 
+-- Grant read (SELECT) and write (INSERT, UPDATE, DELETE) permissions on all tables in the schemas
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA plf TO hrushikesh.sawant;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA bkp TO hrushikesh.sawant;
+ 
+-- Grant permissions for sequences (if any)
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA plf TO hrushikesh.sawant;
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA bkp TO hrushikesh.sawant;
+ 
+-- Ensure future tables and sequences get the same permissions
+ALTER DEFAULT PRIVILEGES IN SCHEMA plf GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO hrushikesh.sawant;
+ALTER DEFAULT PRIVILEGES IN SCHEMA plf GRANT USAGE, SELECT ON SEQUENCES TO hrushikesh.sawant;
+ 
+ALTER DEFAULT PRIVILEGES IN SCHEMA bkp GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO hrushikesh.sawant;
+ALTER DEFAULT PRIVILEGES IN SCHEMA bkp GRANT USAGE, SELECT ON SEQUENCES TO hrushikesh.sawant;
+
+
+
+ALTER VIEW vw_profectus_hunter_live  OWNER TO finappuser;
+
+
+====================================================================================
+
+psql -U proadmin -h before-eod-prod-db-pennant-encrypted-upgraded-02-02-2025.cn0wxnkvpvcb.ap-south-1.rds.amazonaws.com  -d PRODPLFM 
+
+
+GRANT CONNECT ON DATABASE "PRODPLFM" TO "pennantvendor";
+GRANT USAGE,create ON SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "pennantvendor";
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "pennantvendor";
+GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" TO "pennantvendor";
+
+ALTER DEFAULT PRIVILEGES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public" GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO "pennantvendor";
+ALTER DEFAULT PRIVILEGES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata","plf","plfaudit","plfext","plfsnap","public"  GRANT USAGE, SELECT ON SEQUENCES TO "pennantvendor";
+
+
+psql -U proadmin -h before-eod-prod-db-pennant-encrypted-upgraded-08-01-2025.cn0wxnkvpvcb.ap-south-1.rds.amazonaws.com -d PRODPLFM 
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON facilitydetails_aview TO pennantvendor;
+
+SELECT 
+    privilege_type, 
+    has_table_privilege('pennantvendor', 'facilitydetails_aview', privilege_type) AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
+
+
+SELECT 
+    'a_test_view' AS view_name, 
+    privilege_type, 
+    CASE 
+        WHEN has_table_privilege('pennantvendor', 'facilitydetails_aview', privilege_type) 
+        THEN 'YES' 
+        ELSE 'NO' 
+    END AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
+
+SELECT 
+    'pennantvendor' AS user_name,
+    'finfeerefundheader_tview' AS view_name, 
+    privilege_type, 
+    CASE 
+        WHEN has_table_privilege('pennantvendor', 'finfeerefundheader_tview', privilege_type) 
+        THEN 'YES' 
+        ELSE 'NO' 
+    END AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
+
+
+SELECT 
+    grantee AS user_name,
+    table_name AS view_name,
+    privilege_type, 
+    CASE 
+        WHEN privilege_type IS NOT NULL 
+        THEN 'YES' 
+        ELSE 'NO' 
+    END AS has_privilege
+FROM information_schema.role_table_grants
+WHERE table_name = 'facilitydetails_aview' 
+AND grantee = 'pennantvendor';
+
+
+psql -U proadmin   -h after-eom-prod-db-pennant-encrypted-upgraded-feb-2025.cn0wxnkvpvcb.ap-south-1.rds.amazonaws.com -d PRODPLFM 
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON plf.c TO "pennantvendor";
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "plfaudit","bkp","plf" TO "pennantvendor";
+
+GRANT USAGE ON SCHEMA "plfaudit","bkp","plf" TO "pennantvendor";
+
+
+SELECT 
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    has_table_privilege('pennantvendor', tab.table_schema || '.' || tab.table_name, 'SELECT') AS has_select,
+    has_table_privilege('pennantvendor', tab.table_schema || '.' || tab.table_name, 'INSERT') AS has_insert,
+    has_table_privilege('pennantvendor', tab.table_schema || '.' || tab.table_name, 'UPDATE') AS has_update,
+    has_table_privilege('pennantvendor', tab.table_schema || '.' || tab.table_name, 'DELETE') AS has_delete
+FROM 
+    information_schema.tables tab
+WHERE 
+    tab.table_schema = 'plfaudit'  -- Replace with your schema name
+ORDER BY 
+    tab.table_name;
+
+
+
+SELECT 
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    has_table_privilege('sandeshbiranje.ext', tab.table_schema || '.' || tab.table_name, 'SELECT') AS has_select,
+    has_table_privilege('sandeshbiranje.ext', tab.table_schema || '.' || tab.table_name, 'INSERT') AS has_insert,
+    has_table_privilege('sandeshbiranje.ext', tab.table_schema || '.' || tab.table_name, 'UPDATE') AS has_update,
+    has_table_privilege('sandeshbiranje.ext', tab.table_schema || '.' || tab.table_name, 'DELETE') AS has_delete
+FROM 
+    information_schema.tables tab
+WHERE 
+    tab.table_schema = 'public'  -- Replace with your schema name
+ORDER BY 
+    tab.table_name;
+
+
+
+for pgadmin or dbevar:-
+
+SELECT 
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    has_table_privilege('sandeshbiranje.ext', quote_ident(tab.table_schema) || '.' || quote_ident(tab.table_name), 'SELECT') AS has_select,
+    has_table_privilege('sandeshbiranje.ext', quote_ident(tab.table_schema) || '.' || quote_ident(tab.table_name), 'INSERT') AS has_insert,
+    has_table_privilege('sandeshbiranje.ext', quote_ident(tab.table_schema) || '.' || quote_ident(tab.table_name), 'UPDATE') AS has_update,
+    has_table_privilege('sandeshbiranje.ext', quote_ident(tab.table_schema) || '.' || quote_ident(tab.table_name), 'DELETE') AS has_delete
+FROM 
+    information_schema.tables tab
+WHERE 
+    tab.table_schema = 'public'
+ORDER BY 
+    tab.table_name;
+	
+	
+SELECT 
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    'hrushikesh.sawant' AS user_name,
+
+    CASE 
+        WHEN has_table_privilege('hrushikesh.sawant', quote_ident(tab.table_schema) || '.' || quote_ident(tab.table_name), 'SELECT') 
+        THEN 'YES' ELSE 'NO' 
+    END AS select_access,
+
+    CASE 
+        WHEN has_table_privilege('hrushikesh.sawant', quote_ident(tab.table_schema) || '.' || quote_ident(tab.table_name), 'INSERT') 
+        THEN 'YES' ELSE 'NO' 
+    END AS insert_access,
+
+    CASE 
+        WHEN has_table_privilege('hrushikesh.sawant', quote_ident(tab.table_schema) || '.' || quote_ident(tab.table_name), 'UPDATE') 
+        THEN 'YES' ELSE 'NO' 
+    END AS update_access,
+
+    CASE 
+        WHEN has_table_privilege('hrushikesh.sawant', quote_ident(tab.table_schema) || '.' || quote_ident(tab.table_name), 'DELETE') 
+        THEN 'YES' ELSE 'NO' 
+    END AS delete_access
+
+FROM 
+    information_schema.tables tab
+WHERE 
+    tab.table_schema = 'public'
+ORDER BY 
+    tab.table_name;
+
+
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA "public" TO "sandeshbiranje.ext", "Hrushikesh.sawant";
+========================================================================
+
+SELECT 
+    'pennantvendor' AS user_name,
+    'npa_provision_stage' AS view_name, 
+    privilege_type, 
+    CASE 
+        WHEN has_table_privilege('pennantvendor', 'npa_provision_stage', privilege_type) 
+        THEN 'YES' 
+        ELSE 'NO' 
+    END AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
+
+
+
+
+===========================================================================================================================
+Username -    akshaybk.ext.pcpl
+
+Password -   WSo2dga#2636 
+
+Username -  sujatamohite.ext.pcpl
+
+Password -  Kdhenfhg@16fj
+
+ 
+
+-- Create read-only users with a 3-month validity
+CREATE USER "akshaybk.ext.pcpl" VALID UNTIL '2025-04-13' PASSWORD 'WSo2dga#2636';
+CREATE USER "sujatamohite.ext.pcpl" VALID UNTIL '2025-04-13' PASSWORD 'Kdhenfhg@16fj';
+
+-- Grant access to the PRODPLFM database
+GRANT CONNECT ON DATABASE "PRODPLFM" TO "akshaybk.ext.pcpl";
+GRANT CONNECT ON DATABASE "PRODPLFM" TO "sujatamohite.ext.pcpl";
+
+-- Grant USAGE on schemas (allows access but not modifications)
+GRANT USAGE ON SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata",
+                      "plf","plfaudit","plfext","plfsnap","public" 
+TO "akshaybk.ext.pcpl", "sujatamohite.ext.pcpl";
+
+-- Grant SELECT (read-only access) on all tables
+GRANT SELECT ON ALL TABLES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata",
+                                     "plf","plfaudit","plfext","plfsnap","public" 
+TO "akshaybk.ext.pcpl", "sujatamohite.ext.pcpl";
+
+-- Grant USAGE on sequences (allows reading sequence values)
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA "DL_EOM","LeadSquared","PLF_DR","bkp","cron","magic","otherdata",
+                                       "plf","plfaudit","plfext","plfsnap","public" 
+TO "akshaybk.ext.pcpl", "sujatamohite.ext.pcpl";
+
+
+-------------+----------
+ DL_EOM      | proadmin
+ LeadSquared | proadmin
+ PLF_DR      | proadmin
+ bkp         | proadmin
+ cron        | proadmin
+ magic       | proadmin
+ otherdata   | proadmin
+ plf         | proadmin
+ plfaudit    | proadmin
+ plfext      | proadmin
+ plfsnap     | proadmin
+ public      | proadmin
+ 
+ 
+REVOKE ALL PRIVILEGES ON ALL TABLES IN SCHEMA "DL_EOM", "LeadSquared", "PLF_DR", "bkp", "cron", "magic", "otherdata", "plf", "plfaudit", "plfext", "plfsnap", "public"  FROM "sujatamohite.ext.pcpl", "akshaybk.ext.pcpl";
+
+REVOKE ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA "DL_EOM", "LeadSquared", "PLF_DR", "bkp", "cron", "magic", "otherdata", "plf", "plfaudit", "plfext","plfsnap","public"  FROM "sujatamohite.ext.pcpl", "akshaybk.ext.pcpl";
+
+REVOKE ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA DL_EOM, LeadSquared, PLF_DR, bkp, cron, magic, otherdata, plf, plfaudit, plfext, plfsnap, public 
+FROM sujatamohite.ext.pcpl, akshaybk.ext.pcpl;
+
+REVOKE USAGE ON SCHEMA DL_EOM, LeadSquared, PLF_DR, bkp, cron, magic, otherdata, plf, pl
+
+
+
+SELECT 
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    'sujatamohite.ext.pcpl' AS user_name,
+    has_table_privilege('hrushikesh.sawant', tab.table_schema || '.' || tab.table_name, 'SELECT') AS has_select,
+    has_table_privilege('hrushikesh.sawant', tab.table_schema || '.' || tab.table_name, 'INSERT') AS has_insert,
+    has_table_privilege('hrushikesh.sawant', tab.table_schema || '.' || tab.table_name, 'UPDATE') AS has_update,
+    has_table_privilege('hrushikesh.sawant', tab.table_schema || '.' || tab.table_name, 'DELETE') AS has_delete
+FROM 
+    information_schema.tables tab
+WHERE 
+    tab.table_schema = 'DL_EOM'  -- Replace with your schema name
+ORDER BY 
+    tab.table_name;
+	
+SELECT
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    'sujatamohite.ext.pcpl' AS user_name,
+    has_table_privilege('sujatamohite.ext.pcpl', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'SELECT') AS has_select,
+    has_table_privilege('sujatamohite.ext.pcpl', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'INSERT') AS has_insert,
+    has_table_privilege('sujatamohite.ext.pcpl', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'UPDATE') AS has_update,
+    has_table_privilege('sujatamohite.ext.pcpl', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'DELETE') AS has_delete
+FROM
+    information_schema.tables tab
+WHERE
+    tab.table_schema = 'PLF_DR'  -- Case-sensitive schema name
+ORDER BY
+    tab.table_name;
+=========================================================================================================
+
+SELECT
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    'sandeshbiranje.ext' AS user_name,
+    CASE
+        WHEN has_table_privilege('sandeshbiranje.ext', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'SELECT') 
+        THEN 'YES'
+        ELSE 'NO'
+    END AS has_select
+FROM
+    information_schema.tables tab
+WHERE
+    tab.table_schema = 'bkp'
+ORDER BY
+    tab.table_name;
+
+
+
+===================
+
+SELECT
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    'pennantvendor' AS user_name,
+    CASE 
+        WHEN has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'SELECT') 
+        THEN 'YES' ELSE 'NO' 
+    END AS has_select,
+    CASE 
+        WHEN has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'INSERT') 
+        THEN 'YES' ELSE 'NO' 
+    END AS has_insert,
+    CASE 
+        WHEN has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'UPDATE') 
+        THEN 'YES' ELSE 'NO' 
+    END AS has_update,
+    CASE 
+        WHEN has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'DELETE') 
+        THEN 'YES' ELSE 'NO' 
+    END AS has_delete
+FROM
+    information_schema.tables tab
+WHERE
+    tab.table_schema = 'plfaudit'
+ORDER BY
+    tab.table_name;
+===================================
+
+SELECT
+    tab.table_schema AS schema_name,
+    tab.table_name,
+    'pennantvendor' AS user_name,
+
+    has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'SELECT') AS can_select,
+    has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'INSERT') AS can_insert,
+    has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'UPDATE') AS can_update,
+    has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'DELETE') AS can_delete,
+    has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'TRUNCATE') AS can_truncate,
+    has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'REFERENCES') AS can_references,
+    has_table_privilege('pennantvendor', '"' || tab.table_schema || '"."' || tab.table_name || '"', 'TRIGGER') AS can_trigger
+
+FROM
+    information_schema.tables tab
+WHERE
+    tab.table_schema = 'plfaudit'
+    AND tab.table_type = 'BASE TABLE'
+ORDER BY
+    tab.table_name;
+
+===================================
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON  public.pcpl_cibil_trigger_commercial TO magicxpiuser;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON  public.pcpl_consumer_cibil_trigger  TO magicxpiuser;
+
+
+pcpl_cibil_trigger_commercial and pcpl_consumer_cibil_trigger table
+
+
+
+To see whhich schema view is prsent 
+
+SELECT table_schema, table_name
+FROM information_schema.views
+WHERE table_name = 'pan_verify_dtl_view';
+
+
+SELECT 
+    'magicxpiuser' AS user_name,
+    'pan_verify_dtl_view' AS view_name, 
+    privilege_type, 
+    CASE 
+        WHEN has_table_privilege('magicxpiuser', 'pan_verify_dtl_view', privilege_type) 
+        THEN 'YES' 
+        ELSE 'NO' 
+    END AS has_privilege
+FROM (
+    VALUES ('SELECT'), ('INSERT'), ('UPDATE'), ('DELETE')
+) AS privileges(privilege_type);
