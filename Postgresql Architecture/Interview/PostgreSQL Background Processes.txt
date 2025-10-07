@@ -1,0 +1,116 @@
+PostgreSQL Background Processes (High-level)
+
+जेव्हा PostgreSQL instance सुरू होतं, तेव्हा काही mandatory background processes सुरू होतात.
+त्यांचे काम database चे health, performance आणि reliability maintain करणं असतं.
+
+मुख्य processes:
+
+Postgres Server Process → client connections handle करतो (प्रत्येक client साठी नवा process fork होतो).
+
+Background Writer → dirty pages हळूहळू disk वर flush करतो.
+
+Checkpointer → checkpoint record लिहून मोठ्या प्रमाणावर dirty pages flush करतो.
+
+WAL Writer → WAL (Write Ahead Log) buffer disk वर लिहितो.
+
+Autovacuum Launcher + Workers → dead tuples साफ करतात (vacuum).
+
+Archiver → WAL logs archive करतो (backup, PITR साठी).
+
+Stats Collector / PgStat → database activity statistics जमा करतो.
+
+Logical Replication Launcher → replication jobs चालवतो (जर configure असेल तर).
+
+Syslogger → logs manage करतो.
+
+🔹 आता "dirty pages" context मध्ये हे processes कसे काम करतात:
+1. WAL Writer
+
+जेव्हा tuple update/delete होते → change प्रथम WAL buffer मध्ये जातो.
+
+WAL writer हा buffer सतत disk वर (pg_wal directory मध्ये) flush करतो.
+👉 हे data safety साठी: crash झालं तरी WAL मधून recovery करता येईल.
+
+2. Background Writer
+
+जेव्हा बदल RAM मध्ये (shared buffer मध्ये) होतो → त्या page ला "dirty" flag मिळतो.
+
+Background writer दर 200ms ला wake होऊन थोडे dirty pages disk वर flush करतो.
+👉 हे कारण: checkpoint वेळी एकदम खूप load येऊ नये.
+
+3. Checkpointer
+
+प्रत्येक checkpoint वेळी:
+
+WAL मध्ये checkpoint record लिहितो → “या पॉईंटपर्यंतचे बदल सुरक्षित झाले आहेत”.
+
+मग त्या पॉईंटपर्यंतची सगळी dirty pages disk वर लिहून टाकतो.
+👉 अचानक मोठं writing होतं (जर background writer ने जास्त मदत केली नसेल तर).
+
+4. Autovacuum Workers
+
+जेव्हा tuples delete किंवा update होतात → जुने tuples "dead" होतात (पण disk वर जागा घेतात).
+
+Autovacuum process हे dead tuples काढून टाकतो.
+
+यामुळे bloat कमी होतं आणि future queries fast राहतात.
+
+👉 Example:
+
+जर autovacuum बंद असेल → millions of dead tuples जमा होतील → queries slow → disk usage वाढेल.
+
+5. Archiver
+
+जर WAL archiving enabled असेल (archive_mode = on) → WAL files archive करून safe location ला पाठवतो (backup, DR साठी).
+
+6. Stats Collector
+
+प्रत्येक query execution, table usage, tuple insert/update/delete ची माहिती गोळा करतो.
+
+Autovacuum decisions, query planner cost calculations साठी statistics वापरली जातात.
+
+🔹 Example Case — सर्व processes एकत्र कसे काम करतात?
+
+समजा एक banking application मध्ये transactions टेबलवर heavy load आहे:
+
+User transaction insert करतो →
+
+Change RAM (shared buffer) मध्ये dirty page म्हणून जातं.
+
+WAL record तयार होतो (WAL writer disk वर लिहितो).
+
+Background writer → सतत काही dirty pages डिस्कवर टाकतो.
+
+Checkpoint येतो → उरलेली dirty pages सगळी डिस्कवर लिहिली जातात.
+
+Delete / Update मुळे जुन्या tuples dead झाले →
+
+Autovacuum worker चालतो → dead tuples साफ करतो.
+
+Archiver → checkpoint नंतरचे WAL logs archive मध्ये पाठवतो.
+
+Stats collector → किती inserts/deletes झाले, किती dead tuples आहेत, हे data track करतो.
+
+🔹 Marathi Analogy (घरगुती उदाहरण)
+
+WAL Writer = तुम्ही notebook मध्ये लगेच notes लिहून ठेवता (काही विसरलात तरी safe).
+
+Background Writer = रोज थोडे थोडे papers cupboard मध्ये ठेवणारा clerk.
+
+Checkpointer = महिन्याच्या शेवटी बॉस audit करतो आणि सांगतो “सगळं आता cupboard मध्ये ठेवा”.
+
+Autovacuum = सफाई कामगार → जुने, नकोसे papers काढून टाकतो.
+
+Archiver = तुमची आई → महत्वाची papers photocopy करून दुसऱ्या safe cupboard मध्ये ठेवते.
+
+Stats Collector = attendance register → कोण किती काम करतंय याची नोंद ठेवतो.
+
+🔹 सारांश
+
+Checkpointer + Background Writer → dirty pages manage करतात.
+
+WAL Writer + Archiver → data durability आणि recovery handle करतात.
+
+Autovacuum → dead tuples साफ करून जागा रिकामी ठेवतो.
+
+Stats Collector → database ला self-tuning साठी information देतो.
