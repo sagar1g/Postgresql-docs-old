@@ -1,0 +1,136 @@
+🧠 Detailed explanation of how a SELECT query vs. an INSERT/UPDATE/DELETE query flows through PostgreSQL internals, especially involving:
+
+1.Shared Buffers
+
+2.WAL
+
+3.WAL Writer
+
+4.Background Writer
+
+5.Checkpointer
+
+6. Archiver
+
+==============================================================================================================
+
+Let’s break it into two flows:
+
+🔍 FLOW 1: SELECT Query (Read-only)
+Example:
+
+SELECT * FROM emp WHERE empid = 101;
+
+
+🔁 What Happens Internally:
+
+Step	Component	Action
+
+1️⃣	Client	Sends the SELECT query to PostgreSQL
+
+2️⃣	Parser/Planner	SQL is parsed & query plan is generated
+
+3️⃣	Executor	Executes the query plan
+
+4️⃣	Shared Buffers	PostgreSQL checks if the emp table page is already loaded in shared buffers
+
+5️	        ✔️ If present, reads from memory (fast)
+6️	        ❌ If not present, reads from disk and loads into Shared Buffers
+
+7️⃣	Result	Rows are sent back to the client
+
+💡 Important Notes:
+
+SELECT queries do NOT write anything, so:
+
+❌ No WAL entry
+
+❌ No background writer
+
+❌ No checkpointer
+
+❌ No archiver
+
+
+✅ It only uses Shared Buffers and possibly disk I/O (if data isn't cached)
+
+==========================================================================================================================
+
+✍️ FLOW 2: INSERT / UPDATE / DELETE Query (Write)
+Let’s take this UPDATE example:
+
+UPDATE emp SET salary = 70000 WHERE empid = 101;
+
+
+🔁 What Happens Internally:
+
+Step	Component	Action
+
+1️⃣	Client	Sends the UPDATE query
+
+2️⃣	Parser/Planner	SQL is parsed and a plan is made
+
+3️⃣	Executor	Executes the plan
+
+4️⃣	Shared Buffers	PostgreSQL loads the data block into memory (Shared Buffers) if not already loaded
+
+5️⃣		The data block is modified (new salary written in memory)
+
+6️⃣	WAL Buffer	WAL entry is created to describe this change and written to WAL buffer
+
+7️⃣	WAL Writer	Periodically writes WAL buffer to pg_wal/ directory (persistent disk)
+
+8️⃣	Background Writer (bgwriter)	Periodically flushes dirty pages (changed blocks) from Shared Buffers to actual table file on disk
+
+9️⃣	Checkpointer	At checkpoint, it forces all dirty pages and WAL sync to disk. Records checkpoint location
+
+🔟	Archiver	If WAL file (16MB) is completed, archiver runs archive_command to copy file from pg_wal/ to archive dir
+
+
+🧠 Key Points:
+Component	    Used in SELECT?	 Used in UPDATE/INSERT/DELETE?
+Shared Buffers	    ✅ Yes	        ✅ Yes
+WAL Buffer	        ❌ No	        ✅ Yes
+WAL Writer	        ❌ No	        ✅ Yes
+Background Writer	❌ No	        ✅ Yes
+Checkpointer	    ❌ No	        ✅ Yes
+Archiver	        ❌ No	        ✅ Yes (when WAL segment closes)
+
+
+🔄 Timeline of Events (Write Query):
+
+Update runs ➝ Page modified in Shared Buffers
+        ➝ WAL record created in memory (WAL buffer)
+        ➝ WAL Writer writes to pg_wal/
+        ➝ Background Writer flushes dirty page to table
+        ➝ Checkpointer flushes all for a checkpoint
+        ➝ Archiver archives WAL segment if it's closed
+		
+		
+📁 Real Files on Disk Affected:
+
+
+Type	            Path	                                   Example
+WAL File	       pg_wal/	                                 0000000100000000000000A1
+
+Table Data File	   base/<dbid>/<relfilenode>	             Physical file holding emp table
+
+Archived WAL	   archive dir (via archive_command)	      /mnt/backup/0000000100000000000000A1
+
+
+🔎 Monitoring View
+You can use system views to monitor everything:
+
+Component	            View
+WAL stats	         pg_stat_wal
+Archiver stats	    pg_stat_archiver
+Checkpoint info	    pg_stat_bgwriter
+Buffers & I/O	    pg_stat_io, pg_buffercache (extension)
+
+
+📌 Summary Comparison
+Feature	                SELECT	                             INSERT / UPDATE / DELETE
+Shared Buffers	        ✅ Yes	                               ✅ Yes
+WAL	                   ❌ No	                               ✅ Yes
+Disk Writes	           ❌ Rare (only if page not cached)	   ✅ Yes (bgwriter, checkpointer)
+Archiving	           ❌ No	                               ✅ Yes (if WAL file is closed)
