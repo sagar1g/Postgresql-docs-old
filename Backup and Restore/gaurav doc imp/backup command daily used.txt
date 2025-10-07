@@ -1,0 +1,77 @@
+******************************** pg_base_backup ***********************************************************************************************
+pg_basebackup -D /var/lib/pgsql/15/data -h 192.168.29.193 -p 5432 -Xs -R -P > backup.log 2>&1
+
+pg_basebackup   -D /path/to/backup -h 192.168.29.193 -p 5432 -Xs -R -P > backup.log 2>&1
+
+pg_basebackup -h <server_ip> -U <replication_user> -D /backup_dir --progress --max-rate=10MB
+
+pg_basebackup -h <server_ip> -U <replication_user> -D /backup_dir --progress --checkpoint-timeout=300
+
+
+
+
+
+-D /var/lib/pgsql/15/data → Target data directory for restore.
+
+-h 192.168.29.193 → Source PostgreSQL server IP.
+
+-p 5432 → Port number.
+
+-Xs → Include WAL files in tar or plain format.
+
+-R → Automatically write standby.signal and primary_conninfo (for streaming replication).
+
+-P → Show progress.
+
+> backup.log 2>&1 → Logs all output (stdout + stderr) to backup.log.
+
+===========================================================================================================================
+if check_point is not happen :- 
+
+Step1:- primary side hit check_point twice:- 
+
+checkpoint;
+
+Step2:- use pg_basebackup command:- 
+
+pg_basebackup   -D /data/pgdata --checkpoint=fast -h 100.127.129.45 -p 5432 -Xs -R -P > backup.log 2>&1
+
+
+=================================pg_rewind=======================================================
+
+PGPASSWORD='B(!t$@12Pl45' /usr/lib/pgsql-15.3/bin/pg_rewind --target-pgdata=/application/postgresql-15/data --source-server="host=172.26.2.5 user=postgres" -P > rewind.log 2>&1
+
+
+
+================================================Pg_dump=======================================================================
+
+
+1. pg_dump -U username -h hostname -d database_name | gzip > backup_name.sql.gz
+
+2.pg_dump -U postgres -h localhost -d mydatabase -Fd -j 4 -Z 9 -f mydatabase_backup_dir -------------parllel cpu used
+
+3. pg_dump -U username -h hostname -d database_name -Fc -f backup_name.dump
+
+/usr/pgsql-15/bin/pg_basebackup -U postgres -p 5432 -D backup location  -P -Ft -R 
+
+
+4. pg_dump -U username -h hostname -d database_name | gzip > backup_name.sql.gz
+
+5. pg_dump -U postgres -h localhost -d mydatabase -Fd -j 4 -Z 9 -f mydatabase_backup_dir -------------parllel cpu used
+
+-j 4 Use 4 parallel jobs to speed up the dump (only valid with -Fd).
+-Z 9 Use maximum compression (level 9).
+
+
+6. pg_dump -U username -h hostname -d database_name -Fc -f backup_name.dump -------------------- custom format 
+
+7. pg_dump -U smile_mod -h 10.189.8.160 -p 54032 -d polc_claims_db --schema claims -v -x -O  -f /backup_25/calmis.sql
+
+-v :- Verbose mode — shows detailed progress output.
+-x :- Exclude privileges (GRANT/REVOKE) from the dump.
+-O :- Exclude ownership information (i.e., no OWNER TO ... lines).
+-Fc :- Dump in custom format, useful for selective restoration via pg_restore.
+
+--data-only or -a:- Exclude all schema definitions (like CREATE TABLE, CREATE INDEX, ALTER TABLE, etc.)
+
+                     Include only INSERT or COPY commands that load data into existing tables.
