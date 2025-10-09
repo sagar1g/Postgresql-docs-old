@@ -1,0 +1,38 @@
+STEP3)PGPOOL-II INSTALLATION FROM SOURCE CODE ON PRIMARY_SERVER
+i)pgpool-II Installation
+wget https://www.pgpool.net/mediawiki/download.php?f=pgpool-II-4.4.0.tar.gz
+tar -xvzf download.php\?f\=pgpool-II-4.4.0.tar.gz
+cd pgpool-II-4.4.0/
+./configure
+make
+make install
+mkdir /var/run/pgpool/
+ii) pgpool-II Configuration
+bin_path :/usr/local/bin/
+Config_files_path:/usr/local/etc/
+Sample Configuration files:
+cd /usr/local/etc/
+-rw-r--r--. 1 root root 52K Feb 10 00:28 pgpool.conf.sample
+-rw-r--r--. 1 root root 858 Feb 10 00:28 pcp.conf.sample
+-rw-r--r--. 1 root root 3.4K Feb 10 00:28 pool_hba.conf.sample
+-rw-r--r--. 1 root root 2.8K Feb 10 00:28 failover.sh.sample
+-rw-r--r--. 1 root root 6.9K Feb 10 00:28 follow_primary.sh.sample
+-rw-r--r--. 1 root root 3.4K Feb 10 00:28 recovery_1st_stage.sample
+-rw-r--r--. 1 root root 1.2K Feb 10 00:28 pgpool_remote_start.sample
+-rw-r--r--. 1 root root 1.2K Feb 10 00:28 replication_mode_recovery_2nd_stage.sample
+-rw-r--r--. 1 root root 3.3K Feb 10 00:28 replication_mode_recovery_1st_stage.sample
+-rw-r--r--. 1 root root 643 Feb 10 00:28 escalation.sh.sample
+-rw-r--r--. 1 root root 2.5K Feb 10 00:28 aws_rtb_if_cmd.sh.sample
+-rw-r--r--. 1 root root 1.6K Feb 10 00:28 aws_eip_if_cmd.sh.sample
+
+
+==============================================================================================================================
+
+stop pg_pool:- 
+
+/usr/local/bin/pgpool -m fast stop
+
+
+start pg_pool:-
+
+/usr/local/bin/pgpool -n > /data/pool.log 2>&1 &

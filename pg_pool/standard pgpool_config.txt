@@ -1,0 +1,106 @@
+
+# PgPool-II Configuration File
+
+# 1. Connection Settings
+listen_addresses = '*'               # Listen on all network interfaces
+port = 9999                          # PgPool connection port
+unix_socket_directories = '/tmp'     # Unix socket directory for local connections
+
+# PgPool communication settings (PCP for managing PgPool)
+pcp_listen_addresses = '*'           # Listen on all network interfaces for PCP
+pcp_port = 9898                      # PCP management port
+
+# 2. Backend Connection Settings
+# Backend database connection configuration
+backend_hostname0 = 'db1.example.com'
+backend_port0 = 5432
+backend_weight0 = 1                  # Weight for load balancing
+backend_data_directory0 = '/data/db1'
+backend_flag0 = 'ALLOW_TO_FAILOVER'  # Allow failover for this backend
+
+backend_hostname1 = 'db2.example.com'
+backend_port1 = 5432
+backend_weight1 = 1
+backend_data_directory1 = '/data/db2'
+backend_flag1 = 'ALLOW_TO_FAILOVER'
+
+# 3. Authentication Settings
+enable_pool_hba = on                    # Enable pool-level HBA
+pool_passwd = 'pool_passwd'             # Location for the password file
+authentication_timeout = 1min           # Timeout for authentication attempts
+allow_clear_text_frontend_auth = off    # Disallow clear-text frontend auth
+
+# 4. Connection Pooling Settings
+max_pool = 100                         # Maximum number of connections in the pool
+num_init_children = 32                 # Number of initial child processes
+min_spare_children = 5                 # Minimum number of spare child processes
+max_spare_children = 10                # Maximum number of spare child processes
+child_life_time = 5min                 # Time before a child process is terminated
+child_max_connections = 500            # Max number of connections a child can handle
+connection_life_time = 5min            # Connection timeout
+client_idle_limit = 5min               # Idle connection timeout
+
+# 5. Load Balancing and Replication Settings
+load_balance_mode = on                 # Enable load balancing
+replicate_select = on                  # Replicate SELECT queries across backends
+insert_lock = off                      # Allow writes to be load-balanced
+
+# 6. Health Check Settings
+health_check_period = 10               # Period for health check of backends
+health_check_timeout = 20              # Timeout for health checks
+health_check_user = 'postgres'        # Health check user
+health_check_password = 'password'    # Health check password
+health_check_database = 'postgres'    # Health check database
+
+# 7. Logging Settings
+log_destination = 'stderr'              # Log to stderr
+log_line_prefix = '%m: %a pid %p: '     # Log format prefix
+log_connections = on                    # Log new connections
+log_disconnections = on                 # Log disconnections
+log_statement = 'none'                  # Log no SQL statements (you can change to 'ddl', 'mod' based on needs)
+log_per_node_statement = off            # Disable per-node logging of queries
+logging_collector = on                  # Enable logging collector
+log_directory = '/data/pg_log'          # Log file directory
+log_filename = 'pgpool-%d.log'          # Log file name format
+log_rotation_age = 1d                   # Rotate logs daily
+log_rotation_size = 0                   # No size limit for log rotation
+
+
+===============================================================================================================================================================
+
+# 8. Failover and Failback (Optional)
+failover_command = '/path/to/failover_script'  # Path to failover script
+failback_command = '/path/to/failback_script'  # Path to failback script
+failover_on_backend_error = on                 # Failover on backend error
+failover_on_backend_shutdown = off             # Disable failover on backend shutdown (you can enable as needed)
+auto_failback = off                            # Disable automatic failback (set to 'on' if needed)
+
+# 9. Watchdog (Optional)
+use_watchdog = on                            # Enable watchdog for automatic failover
+wd_port = 9000                               # Watchdog port
+pgpool_port = 9999                           # PgPool port
+wd_priority = 1                              # Watchdog priority (lower number means higher priority)
+wd_authkey = 'some_secret_key'               # Watchdog authentication key
+wd_ipc_socket_dir = '/tmp'                   # Directory for IPC socket
+
+# 10. Streaming Replication Mode
+sr_check_period = 10                        # Period for streaming replication checks
+sr_check_user = 'postgres'                  # Streaming replication check user
+sr_check_password = 'password'              # Streaming replication check password
+sr_check_database = 'postgres'              # Streaming replication check database
+prefer_lower_delay_standby = off            # Disable preference for lower delay standby
+
+# 11. Failover and Health Check Parameters for Each Node
+# For Node 0
+health_check_period0 = 10
+health_check_timeout0 = 20
+health_check_user0 = 'postgres'
+health_check_password0 = 'password'
+connect_timeout0 = 10000                   # Timeout for node connection
+
+# For Node 1
+health_check_period1 = 10
+health_check_timeout1 = 20
+health_check_user1 = 'postgres'
+health_check_password1 = 'password'
+connect_timeout1 = 10000                   # Timeout for node connection
