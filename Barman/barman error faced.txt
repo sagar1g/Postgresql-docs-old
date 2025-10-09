@@ -1,0 +1,80 @@
+
+barman error:-
+
+Both root and postgres are using /usr/local/bin/barman, but they are still showing different versions of Barman
+
+
+1.Verify Python Version Used by Barman:-
+
+/usr/local/bin/barman --version
+/usr/local/bin/barman -V
+/usr/local/bin/barman --help | grep Python    ------------> excute on both postgres & barman
+
+
+2.Check the Python Interpreter Used by Barman:-
+
+head -n 1 /usr/local/bin/barman
+
+result:- #!/usr/bin/python3
+
+3.: Identify Python Packages for Barman:- 
+
+/usr/bin/python3 -m pip show barman ------------> excute on both postgres & barman
+
+
+==================================================================================================================
+
+MCVD41S01063:/BARMAN/barman # pip install .
+Processing /BARMAN/barman
+  Preparing metadata (setup.py) ... done
+Collecting psycopg2>=2.4.2
+  Using cached psycopg2-2.9.10.tar.gz (385 kB)
+  Preparing metadata (setup.py) ... error
+  error: subprocess-exited-with-error
+ 
+  × python setup.py egg_info did not run successfully.
+  │ exit code: 1
+  ╰─> [23 lines of output]
+      running egg_info
+      creating /tmp/pip-pip-egg-info-n2iqmfc5/psycopg2.egg-info
+      writing /tmp/pip-pip-egg-info-n2iqmfc5/psycopg2.egg-info/PKG-INFO
+      writing dependency_links to /tmp/pip-pip-egg-info-n2iqmfc5/psycopg2.egg-info/dependency_links.txt
+      writing top-level names to /tmp/pip-pip-egg-info-n2iqmfc5/psycopg2.egg-info/top_level.txt
+      writing manifest file '/tmp/pip-pip-egg-info-n2iqmfc5/psycopg2.egg-info/SOURCES.txt'
+ 
+      Error: pg_config executable not found.
+ 
+      pg_config is required to build psycopg2 from source.  Please add the directory
+      containing pg_config to the $PATH or specify the full executable path with the
+      option:
+ 
+          python setup.py build_ext --pg-config /path/to/pg_config build ...
+ 
+      or with the pg_config option in 'setup.cfg'.
+ 
+      If you prefer to avoid building psycopg2 from source, please install the PyPI
+      'psycopg2-binary' package instead.
+ 
+      For further information please check the 'doc/src/install.rst' file (also at
+<https://www.psycopg.org/docs/install.html>).
+ 
+      [end of output]
+ 
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+error: metadata-generation-failed
+ 
+× Encountered error while generating package metadata.
+╰─> See above for output.
+ 
+note: This is an issue with the package mentioned above, not pip.
+hint: See above for details.
+You have new mail in /var/spool/mail/root
+
+
+sol:- 
+
+zypper install python311-devel
+
+pg_config error:- 
+
+export PATH=$PATH:/usr/lib/pgsql-16.5/bin
